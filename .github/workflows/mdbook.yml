@@ -27,7 +27,7 @@ jobs:
         run: cargo install mdbook --version 0.4.32
 
       - name: Build mdBook
-        run: mdbook build doc
+        run: cd doc && mdbook build
 
       - name: Upload mdBook artifact
         uses: actions/upload-pages-artifact@v3
