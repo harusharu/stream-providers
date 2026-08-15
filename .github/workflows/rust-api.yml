@@ -1,0 +1,72 @@
+name: rust-api
+
+on:
+  push:
+    paths:
+      - 'src/**'
+      - 'worker/**'
+      - 'tests/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'manifest.json'
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'worker/**'
+      - 'tests/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'manifest.json'
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  check:
+    name: fmt, clippy, test, docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Format
+        run: cargo fmt --check
+
+      - name: Lint
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: Unit + integration tests
+        run: cargo test --lib --test integration
+
+      - name: Docs
+        run: RUSTDOCFLAGS="-D warnings" cargo doc --lib --no-deps
+
+  e2e:
+    name: e2e provider sweep
+    runs-on: ubuntu-latest
+    # Real-network provider sweep; run explicitly, not on every push.
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Build bundles
+        run: npm ci && npm run build
+
+      - name: Sweep all enabled providers
+        run: cargo test --test e2e -- --ignored --test-threads=1
