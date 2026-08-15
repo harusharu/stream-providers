@@ -6,3 +6,6 @@ build/
 target/
 doc/book/
 doc/.mdbook
+.agents/
+.claude/
+skills-lock.json
