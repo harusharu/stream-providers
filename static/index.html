@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>harustream-provider-api · Dashboard</title>
+<style>
+  :root {
+    --bg: #0b1020;
+    --panel: #131a31;
+    --panel-2: #1a2342;
+    --border: #26315a;
+    --text: #e6e9f5;
+    --muted: #8b94b8;
+    --accent: #5b8cff;
+    --ok: #35d07f;
+    --warn: #f0b429;
+    --err: #ff5c6c;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, #101732, var(--bg));
+  }
+  header .logo {
+    width: 34px; height: 34px; border-radius: 9px;
+    background: linear-gradient(135deg, var(--accent), #7a5bff);
+    display: grid; place-items: center;
+    font-weight: 800; color: #fff; font-size: 16px;
+  }
+  header h1 { margin: 0; font-size: 17px; letter-spacing: .2px; }
+  header .sub { color: var(--muted); font-size: 12px; }
+  .pill {
+    margin-left: auto;
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px; border-radius: 999px;
+    border: 1px solid var(--border); background: var(--panel);
+    font-size: 12px; font-weight: 600;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+  .dot.ok { background: var(--ok); box-shadow: 0 0 8px var(--ok); }
+  .dot.degraded { background: var(--warn); }
+  main { max-width: 960px; margin: 0 auto; padding: 24px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
+  .card {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 16px;
+  }
+  .card .label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .6px; }
+  .card .value { font-size: 24px; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .card .value small { font-size: 13px; color: var(--muted); font-weight: 500; }
+  .section { margin-top: 22px; }
+  .section > h2 { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; margin: 0 0 10px; }
+  .toolbar {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: end;
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px;
+  }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 11px; color: var(--muted); }
+  select, input {
+    background: var(--panel-2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 8px 10px; font-size: 13px; min-width: 160px;
+  }
+  input { font-family: var(--mono); }
+  button {
+    background: var(--accent); color: #fff; border: 0; border-radius: 8px;
+    padding: 9px 16px; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  button:hover { filter: brightness(1.1); }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  button.ghost { background: var(--panel-2); border: 1px solid var(--border); color: var(--text); }
+  .results {
+    margin-top: 14px; background: #0d1224; border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+  }
+  .results .bar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; border-bottom: 1px solid var(--border);
+    font-family: var(--mono); font-size: 12px; color: var(--muted);
+  }
+  .results .bar .status { font-weight: 700; }
+  .results .bar .status.ok { color: var(--ok); }
+  .results .bar .status.err { color: var(--err); }
+  .results pre {
+    margin: 0; padding: 14px; overflow: auto; max-height: 420px;
+    font-family: var(--mono); font-size: 12px; line-height: 1.55;
+    white-space: pre-wrap; word-break: break-word;
+  }
+  .providers {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px;
+  }
+  .providers .chip {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 5px 11px; border-radius: 999px;
+    border: 1px solid var(--border); background: var(--panel-2);
+    font-size: 12px; cursor: pointer;
+  }
+  .providers .chip:hover { border-color: var(--accent); }
+  .providers .chip .name { font-weight: 600; }
+  .providers .chip .val { color: var(--muted); font-family: var(--mono); font-size: 11px; }
+  .providers .chip .ver { color: var(--muted); font-size: 11px; }
+  .hint { color: var(--muted); font-size: 12px; margin-top: 8px; }
+  .hint code { color: var(--text); background: var(--panel-2); padding: 1px 5px; border-radius: 5px; font-family: var(--mono); font-size: 11px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">P</div>
+  <div>
+    <h1>harustream-provider-api</h1>
+    <div class="sub" id="version">loading…</div>
+  </div>
+  <span class="pill"><span class="dot" id="healthDot"></span><span id="healthText">checking…</span></span>
+</header>
+
+<main>
+  <div class="cards">
+    <div class="card"><div class="label">Status</div><div class="value" id="statStatus">—</div></div>
+    <div class="card"><div class="label">Providers</div><div class="value" id="statProviders">—</div></div>
+    <div class="card"><div class="label">Workers</div><div class="value" id="statWorkers">—</div></div>
+    <div class="card"><div class="label">Gateway</div><div class="value"><span id="statLatency">—</span><small> ms</small></div></div>
+  </div>
+
+  <div class="section">
+    <h2>Providers</h2>
+    <div class="providers" id="providerList">loading…</div>
+  </div>
+
+  <div class="section">
+    <h2>Try an endpoint</h2>
+    <div class="toolbar">
+      <div class="field">
+        <label for="provider">Provider</label>
+        <select id="provider"></select>
+      </div>
+      <div class="field" id="f-query" hidden>
+        <label for="query">query</label>
+        <input id="query" placeholder="e.g. 4K" value="" />
+      </div>
+      <div class="field" id="f-link" hidden>
+        <label for="link">link / url / hub</label>
+        <input id="link" placeholder="/movie/m-… or https://…" style="min-width:300px" />
+      </div>
+      <div class="field" id="f-type" hidden>
+        <label for="type">type</label>
+        <select id="type">
+          <option>movie</option>
+          <option>series</option>
+        </select>
+      </div>
+      <button id="btnCatalog" class="ghost">catalog</button>
+      <button id="btnSearch">search</button>
+      <button id="btnMeta" class="ghost">meta</button>
+      <button id="btnEpisodes" class="ghost">episodes</button>
+      <button id="btnStream" class="ghost">stream</button>
+    </div>
+    <p class="hint" id="endpointHint">
+      Requests hit the API directly: <code id="endpointExample">/api/catalog?provider=vega</code>
+    </p>
+  </div>
+
+  <div class="results" id="results" hidden>
+    <div class="bar"><span class="status" id="resStatus">200</span><span id="resMeta"></span></div>
+    <pre id="resBody"></pre>
+  </div>
+</main>
+
+<script>
+"use strict";
+
+const $ = (id) => document.getElementById(id);
+
+async function json(url) {
+  const started = performance.now();
+  const res = await fetch(url, { headers: { Accept: "application/json" } });
+  const ms = Math.round(performance.now() - started);
+  let body;
+  try { body = await res.json(); } catch { body = await res.text(); }
+  return { res, body, ms };
+}
+
+function isEnvelope(o) {
+  return o && typeof o === "object" && "success" in o && "data" in o;
+}
+
+async function refreshHealth() {
+  const { body, ms } = await json("/health");
+  const ok = body.status === "healthy";
+  $("statStatus").textContent = body.status || "—";
+  $("statProviders").textContent = body.providers ?? "—";
+  $("statWorkers").textContent = body.workers_ok ? "ok" : "down";
+  $("statLatency").textContent = ms;
+  $("healthText").textContent = ok ? "healthy" : "degraded";
+  $("healthDot").className = "dot " + (ok ? "ok" : "degraded");
+}
+
+async function refreshInfo() {
+  const { body } = await json("/info");
+  $("version").textContent = `v${body.version} · ${body.status}`;
+}
+
+async function refreshProviders() {
+  const { body } = await json("/providers");
+  const list = (body.providers || []).filter((p) => !p.disabled);
+  const wrap = $("providerList");
+  wrap.textContent = "";
+  for (const p of list) {
+    const chip = document.createElement("span");
+    chip.className = "chip";
+    chip.title = `value: ${p.value}`;
+    const name = document.createElement("span");
+    name.className = "name";
+    name.textContent = p.display_name || p.value;
+    const val = document.createElement("span");
+    val.className = "val";
+    val.textContent = p.value;
+    const ver = document.createElement("span");
+    ver.className = "ver";
+    ver.textContent = p.version ? "v" + p.version : "";
+    chip.append(name, val, ver);
+    chip.addEventListener("click", () => { $("provider").value = p.value; runCatalog(); });
+    wrap.appendChild(chip);
+  }
+  const sel = $("provider");
+  sel.textContent = "";
+  for (const p of list) {
+    const opt = document.createElement("option");
+    opt.value = p.value;
+    opt.textContent = `${p.display_name || p.value} (${p.value})`;
+    sel.appendChild(opt);
+  }
+}
+
+let latest = null;
+
+function runCatalog() {
+  const p = $("provider").value;
+  setFields(["query", "link", "type"], false);
+  latest = { label: "catalog", url: `/api/catalog?provider=${encodeURIComponent(p)}` };
+  exec();
+}
+function runSearch() {
+  const p = $("provider").value;
+  const q = $("query").value.trim() || "4K";
+  setFields(["query", "link", "type"], false);
+  $("query").value = q;
+  latest = { label: "search", url: `/api/search?provider=${encodeURIComponent(p)}&query=${encodeURIComponent(q)}` };
+  exec();
+}
+function runMeta() {
+  setFields(["query", "type"], false); $("link").hidden = false;
+  const p = $("provider").value;
+  const l = $("link").value.trim();
+  if (!l) { flash("enter a link (e.g. /download-… or /movie/m-…)"); return; }
+  latest = { label: "meta", url: `/api/meta?provider=${encodeURIComponent(p)}&link=${encodeURIComponent(l)}` };
+  exec();
+}
+function runEpisodes() {
+  setFields(["query", "type"], false); $("link").hidden = false;
+  const p = $("provider").value;
+  const l = $("link").value.trim();
+  if (!l) { flash("enter a url (e.g. /download-… or /movie/m-…)"); return; }
+  latest = { label: "episodes", url: `/api/episodes?provider=${encodeURIComponent(p)}&url=${encodeURIComponent(l)}` };
+  exec();
+}
+function runStream() {
+  setFields(["query"], false); $("link").hidden = false; $("type").hidden = false;
+  const p = $("provider").value;
+  const l = $("link").value.trim();
+  const t = $("type").value;
+  if (!l) { flash("enter a hub link (e.g. https://nexdrive.fit/… or /movie/m-…)"); return; }
+  latest = { label: "stream", url: `/api/stream?provider=${encodeURIComponent(p)}&link=${encodeURIComponent(l)}&type=${encodeURIComponent(t)}` };
+  exec();
+}
+
+function setFields(show, state) {
+  for (const id of ["query", "link", "type"]) $("f-" + id).hidden = !show.includes(id);
+}
+
+async function exec() {
+  const btn = document.querySelector("#results");
+  const { res, body, ms } = await json(latest.url);
+  const data = isEnvelope(body) ? body.data : body;
+  const ok = res.ok && data !== null && data !== undefined &&
+    !(Array.isArray(data) && data.length === 0);
+  $("results").hidden = false;
+  $("resStatus").textContent = `${res.status} · ${ms}ms`;
+  $("resStatus").className = "status " + (ok ? "ok" : "err");
+  $("resMeta").textContent = `${latest.label}  →  ${latest.url}`;
+  let out = body;
+  if (ok && isEnvelope(body)) {
+    const count = Array.isArray(data) ? `${data.length} item${data.length === 1 ? "" : "s"}` : "object";
+    $("resMeta").textContent = `${latest.label} · ${count}  →  ${latest.url}`;
+    out = { success: true, count: Array.isArray(data) ? data.length : null, data };
+  }
+  $("resBody").textContent = JSON.stringify(out, null, 2);
+  $("resBody").scrollTop = 0;
+  const example = latest.url.split("?")[0] + "?" + latest.url.split("?")[1];
+  $("endpointExample").textContent = example;
+}
+
+function flash(msg) {
+  $("endpointHint").textContent = "⚠ " + msg;
+  setTimeout(() => { $("endpointHint").textContent = "Requests hit the API directly: " + $("endpointExample").textContent; }, 3500);
+}
+
+$("btnCatalog").addEventListener("click", runCatalog);
+$("btnSearch").addEventListener("click", runSearch);
+$("btnMeta").addEventListener("click", runMeta);
+$("btnEpisodes").addEventListener("click", runEpisodes);
+$("btnStream").addEventListener("click", runStream);
+$("query").addEventListener("keydown", (e) => { if (e.key === "Enter") runSearch(); });
+$("link").addEventListener("keydown", (e) => { if (e.key === "Enter") $("btnMeta").click(); });
+
+refreshInfo();
+refreshHealth();
+refreshProviders().then(runCatalog);
+</script>
+</body>
+</html>
