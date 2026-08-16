@@ -20,8 +20,7 @@ hosters).
 
 ## Architecture
 
-The crate is split into small, single-purpose modules (see the
-[rendered docs](https://harusharu.github.io/stream-providers/)):
+The crate is split into small, single-purpose modules:
 
 ```
 src/
@@ -59,11 +58,11 @@ Upstream streaming sites
 - Worker protocol: `{"id":N,"method":"call","params":{...}}` → `{"id":N,"ok":true,"data":...}`.
   Provider `console.log` is redirected to stderr so it can never corrupt the
   stdout IPC channel.
-- `getBaseUrl()` reads the provider URL manifest endpoint from
-  `URLS_MANIFEST_URL` (single source of truth, set in `.env` — see
-  `.env.example`). When set, the runtime fetches it over the network and falls
-  back to the locally-deployed `urls.json` on failure. When unset, the bundles
-  use the `urls.json` committed to this repo on GitHub raw.
+- `getBaseUrl()` reads `urls.json` from the local project directory by
+  default — the repo keeps that file fresh via the `check-urls` GitHub Action
+  (daily cron, commits working URLs). Setting the optional `URLS_MANIFEST_URL`
+  (see `.env.example`) switches to a network fetch of your own hosted copy
+  instead, falling back to the local file on failure.
 
 ## Endpoints
 
