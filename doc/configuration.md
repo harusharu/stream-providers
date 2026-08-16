@@ -7,6 +7,7 @@
 | `HOST` | `0.0.0.0` | Bind address |
 | `PORT` | `8787` | Bind port |
 | `PROVIDERS_ROOT` | repo root (cwd) | Repo root containing `dist/` + `urls.json` |
+| `URLS_MANIFEST_URL` | unset (bundles default to GitHub raw `urls.json`) | Single source of truth for the provider URL manifest endpoint (`getBaseUrl()`), set in `.env`. When set, the runtime fetches it over the network and falls back to the local `urls.json` on failure. Point it at your own `/urls.json` to drop the GitHub dependency |
 | `DEFAULT_PROVIDER` | `vega` | Provider id used when `provider` is omitted |
 | `WORKER_COUNT` | CPU count | Number of Node sidecar worker processes |
 | `CALL_TIMEOUT_MS` | `75000` | Rust-side per-call timeout (hard cap) |
