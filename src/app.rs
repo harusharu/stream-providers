@@ -71,7 +71,11 @@ fn configure_routes(cfg: &mut web::ServiceConfig) {
         .service(web::resource("/api/stream").route(web::get().to(handlers::stream::stream)))
         .service(web::resource("/health").route(web::get().to(handlers::system::health)))
         .service(web::resource("/providers").route(web::get().to(handlers::system::providers)))
+        .service(
+            web::resource("/api/providers").route(web::get().to(handlers::system::api_providers)),
+        )
         .service(web::resource("/info").route(web::get().to(handlers::system::info)))
+        .service(web::resource("/urls.json").route(web::get().to(handlers::system::urls_manifest)))
         .service(web::resource("/").route(web::get().to(handlers::system::dashboard)))
         .default_service(web::route().to(not_found));
 }
