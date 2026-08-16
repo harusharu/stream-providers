@@ -81,7 +81,8 @@ pub async fn urls_manifest(state: Data<AppState>) -> HttpResponse {
             "code": "NOT_FOUND",
         })),
     }
-}/// `GET /` — the self-contained human dashboard (see `static/index.html`).
+}
+/// `GET /` — the self-contained human dashboard (see `static/index.html`).
 /// Exempt from rate limiting.
 pub async fn dashboard() -> HttpResponse {
     HttpResponse::Ok()
