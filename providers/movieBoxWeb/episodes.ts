@@ -1,6 +1,6 @@
-import { EpisodeLink, ProviderContext } from "../types";
-import { decodeLink, encodeLink } from "./utils";
-import { throwProviderError } from "../providerErrors";
+import { EpisodeLink, ProviderContext } from '../types';
+import { decodeLink, encodeLink } from './utils';
+import { throwProviderError } from '../providerErrors';
 
 export const getEpisodes = async function ({
   url,
@@ -16,7 +16,7 @@ export const getEpisodes = async function ({
       const seasonNumber = season.se || 1;
       const availableEpisodes = season.allEp
         ? season.allEp
-            .split(",")
+            .split(',')
             .map(Number)
             .filter((episode) => episode > 0)
         : Array.from({ length: season.maxEp || 0 }, (_, index) => index + 1);
@@ -24,11 +24,9 @@ export const getEpisodes = async function ({
       for (const episode of availableEpisodes) {
         const resolution = season.resolutions
           ?.filter((item) => (item.epNum || 0) >= episode)
-          .sort(
-            (a, b) => (b.resolution || 0) - (a.resolution || 0),
-          )[0]?.resolution;
+          .sort((a, b) => (b.resolution || 0) - (a.resolution || 0))[0]?.resolution;
         episodes.push({
-          title: `S${String(seasonNumber).padStart(2, "0")} E${String(episode).padStart(2, "0")}`,
+          title: `S${String(seasonNumber).padStart(2, '0')} E${String(episode).padStart(2, '0')}`,
           link: encodeLink({
             ...playback,
             seasons: undefined,
@@ -41,6 +39,6 @@ export const getEpisodes = async function ({
     }
     return episodes;
   } catch (error) {
-    throwProviderError("MovieBox Web", "episodes", error);
+    throwProviderError('MovieBox Web', 'episodes', error);
   }
 };

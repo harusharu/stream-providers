@@ -1,5 +1,5 @@
-import { Post, ProviderContext } from "../types";
-import { getBaseUrl } from "../getBaseUrl";
+import { Post, ProviderContext } from '../types';
+import { getBaseUrl } from '../getBaseUrl';
 
 export const getPosts = async function ({
   filter,
@@ -15,7 +15,7 @@ export const getPosts = async function ({
   providerContext: ProviderContext;
 }): Promise<Post[]> {
   const { axios, cheerio } = providerContext;
-  const baseUrl = await getBaseUrl("showbox");
+  const baseUrl = await getBaseUrl('showbox');
   const url = `${baseUrl + filter}?page=${page}/`;
   return posts({ url, signal, baseUrl, axios, cheerio });
 };
@@ -34,7 +34,7 @@ export const getSearchPosts = async function ({
   providerContext: ProviderContext;
 }): Promise<Post[]> {
   const { axios, cheerio, commonHeaders } = providerContext;
-  const baseUrl = await getBaseUrl("showbox");
+  const baseUrl = await getBaseUrl('showbox');
   const url = `${baseUrl}/search?keyword=${searchQuery}&page=${page}`;
   return posts({
     url,
@@ -57,8 +57,8 @@ async function posts({
   url: string;
   signal: AbortSignal;
   baseUrl: string;
-  axios: ProviderContext["axios"];
-  cheerio: ProviderContext["cheerio"];
+  axios: ProviderContext['axios'];
+  cheerio: ProviderContext['cheerio'];
   headers?: Record<string, string>;
 }): Promise<Post[]> {
   const maxRetries = 3;
@@ -71,10 +71,10 @@ async function posts({
       console.log(data);
       const $ = cheerio.load(data);
       const catalog: Post[] = [];
-      $(".movie-item,.flw-item").map((i, element) => {
-        const title = $(element).find(".film-name").text().trim();
-        const link = $(element).find("a").attr("href");
-        const image = $(element).find("img").attr("src");
+      $('.movie-item,.flw-item').map((i, element) => {
+        const title = $(element).find('.film-name').text().trim();
+        const link = $(element).find('a').attr('href');
+        const image = $(element).find('img').attr('src');
         console.log(title, link, image);
         if (title && link && image) {
           const postUrl = new URL(link, `${baseUrl}/`);

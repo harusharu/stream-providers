@@ -1,1 +1,1 @@
-export * from "../autoEmbed/catalog";
+export * from '../autoEmbed/catalog';

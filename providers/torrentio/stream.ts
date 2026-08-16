@@ -1,36 +1,33 @@
-import { Stream, ProviderContext } from "../types";
-import { throwProviderError } from "../providerErrors";
+import { Stream, ProviderContext } from '../types';
+import { throwProviderError } from '../providerErrors';
 
 const languageCodes = [
-  ["MULTI", "MULTI"],
-  ["DUAL", "DUAL"],
-  ["HINDI", "HI"],
-  ["TAMIL", "TA"],
-  ["TELUGU", "Tz"],
-  ["SPANISH", "SP"],
-  ["FRENCH", "FR"],
-  ["GERMAN", "DE"],
-  ["ITALIAN", "IT"],
-  ["KOREAN", "KO"],
-  ["JAPANESE", "JP"],
-  ["ENGLISH", "EN"],
+  ['MULTI', 'MULTI'],
+  ['DUAL', 'DUAL'],
+  ['HINDI', 'HI'],
+  ['TAMIL', 'TA'],
+  ['TELUGU', 'Tz'],
+  ['SPANISH', 'SP'],
+  ['FRENCH', 'FR'],
+  ['GERMAN', 'DE'],
+  ['ITALIAN', 'IT'],
+  ['KOREAN', 'KO'],
+  ['JAPANESE', 'JP'],
+  ['ENGLISH', 'EN'],
 ] as const;
 
 function getLanguageCodes(title: string): string {
-  const flagCodes = (
-    title.match(/[\uD83C][\uDDE6-\uDDFF][\uD83C][\uDDE6-\uDDFF]/g) || []
-  ).map((flag: string) =>
-    [...flag]
-      .map((character) =>
-        String.fromCharCode(65 + character.codePointAt(0)! - 0x1f1e6),
-      )
-      .join(""),
+  const flagCodes = (title.match(/[\uD83C][\uDDE6-\uDDFF][\uD83C][\uDDE6-\uDDFF]/g) || []).map(
+    (flag: string) =>
+      [...flag]
+        .map((character) => String.fromCharCode(65 + character.codePointAt(0)! - 0x1f1e6))
+        .join(''),
   );
 
   if (flagCodes.length > 0) {
     const unique = [...new Set(flagCodes)];
-    if (unique.length > 2) return "MULTI";
-    return unique.join(", ");
+    if (unique.length > 2) return 'MULTI';
+    return unique.join(', ');
   }
 
   const uppercaseTitle = title.toUpperCase();
@@ -38,7 +35,7 @@ function getLanguageCodes(title: string): string {
     .filter(([language]) => uppercaseTitle.includes(language))
     .map(([, code]) => code);
 
-  return matches.length > 0 ? [...new Set(matches)].join(", ") : "ENG";
+  return matches.length > 0 ? [...new Set(matches)].join(', ') : 'ENG';
 }
 
 export const getStream = async ({
@@ -59,34 +56,34 @@ export const getStream = async ({
       }
     })();
 
-    let imdbId: string = payload.imdbId ?? id ?? "";
-    const season: string = payload.season ?? "";
-    const episode: string = payload.episode ?? "";
-    const effectiveType: string = payload.type ?? type ?? "movie";
+    let imdbId: string = payload.imdbId ?? id ?? '';
+    const season: string = payload.season ?? '';
+    const episode: string = payload.episode ?? '';
+    const effectiveType: string = payload.type ?? type ?? 'movie';
 
     // If ID is not in tt1234567 format, and tmdbId is present but no imdbId, we might fail
     // But autoEmbed usually provides imdbId in payload.
     // If id itself is JSON and we have imdbId, extract it.
-    if (!imdbId || imdbId === "undefined" || imdbId === "[object Object]") {
+    if (!imdbId || imdbId === 'undefined' || imdbId === '[object Object]') {
       // fallback if the string itself was passed directly or something
-      if (id && id.startsWith("tt")) {
+      if (id && id.startsWith('tt')) {
         imdbId = id;
       }
     }
 
-    if (!imdbId || !imdbId.startsWith("tt")) {
-      console.warn("torrentio: missing or invalid imdbId in link payload");
+    if (!imdbId || !imdbId.startsWith('tt')) {
+      console.warn('torrentio: missing or invalid imdbId in link payload');
       return [];
     }
 
     // Torrentio API format
     let url = `https://torrentio.strem.fun/stream/${effectiveType}/${imdbId}`;
-    if (effectiveType === "series" && season && episode) {
+    if (effectiveType === 'series' && season && episode) {
       url += `:${season}:${episode}`;
     }
     url += `.json`;
 
-    console.log("Torrentio URL:", url);
+    console.log('Torrentio URL:', url);
 
     const res = await providerContext.axios.get(url, {
       timeout: 10000,
@@ -97,14 +94,12 @@ export const getStream = async ({
       res.data.streams.forEach((s: any) => {
         // Extract quality from the name or title if possible, or leave undefined
         let quality: any = undefined;
-        const lowerName =
-          (s.name || "").toLowerCase() + " " + (s.title || "").toLowerCase();
-        if (lowerName.includes("2160") || lowerName.includes("4k"))
-          quality = "2160";
-        else if (lowerName.includes("1080")) quality = "1080";
-        else if (lowerName.includes("720")) quality = "720";
-        else if (lowerName.includes("480")) quality = "480";
-        else if (lowerName.includes("360")) quality = "360";
+        const lowerName = (s.name || '').toLowerCase() + ' ' + (s.title || '').toLowerCase();
+        if (lowerName.includes('2160') || lowerName.includes('4k')) quality = '2160';
+        else if (lowerName.includes('1080')) quality = '1080';
+        else if (lowerName.includes('720')) quality = '720';
+        else if (lowerName.includes('480')) quality = '480';
+        else if (lowerName.includes('360')) quality = '360';
 
         let link = s.url;
         if (!link && s.infoHash) {
@@ -112,12 +107,12 @@ export const getStream = async ({
           link = `magnet:?xt=urn:btih:${s.infoHash}`;
         }
 
-        const title = s.title || "";
+        const title = s.title || '';
         const language = getLanguageCodes(title);
-        const size = title.match(/💾\s*([\d.]+\s*(?:KB|MB|GB|TB))/i)?.[1] || "";
-        const uploader = title.match(/⚙️\s*([^\n]+)/)?.[1]?.trim() || "";
+        const size = title.match(/💾\s*([\d.]+\s*(?:KB|MB|GB|TB))/i)?.[1] || '';
+        const uploader = title.match(/⚙️\s*([^\n]+)/)?.[1]?.trim() || '';
 
-        let seeders = "";
+        let seeders = '';
         const seedersMatch = title.match(/👤\s*(\d+)/);
         if (seedersMatch) {
           seeders = `👤${seedersMatch[1]}`;
@@ -130,37 +125,37 @@ export const getStream = async ({
 
         // Extract format tags (DV, HDR, Remux)
         const formatTags: string[] = [];
-        const fullTitle = `${s.name || ""} ${title}`;
-        if (/[\b\s.]DV[\b\s.]|Dolby\s*Vision/i.test(fullTitle)) formatTags.push("DV");
-        if (/[\b\s.]HDR(?:10(?:\+)?)?[\b\s.]/i.test(fullTitle)) formatTags.push("HDR");
-        if (/REMUX/i.test(fullTitle)) formatTags.push("Remux");
+        const fullTitle = `${s.name || ''} ${title}`;
+        if (/[\b\s.]DV[\b\s.]|Dolby\s*Vision/i.test(fullTitle)) formatTags.push('DV');
+        if (/[\b\s.]HDR(?:10(?:\+)?)?[\b\s.]/i.test(fullTitle)) formatTags.push('HDR');
+        if (/REMUX/i.test(fullTitle)) formatTags.push('Remux');
 
-        const tagStr = formatTags.join("/");
+        const tagStr = formatTags.join('/');
 
         const serverParts: string[] = [];
         if (tagStr) serverParts.push(tagStr);
-        if (language && language !== "ENG") serverParts.push(language);
+        if (language && language !== 'ENG') serverParts.push(language);
         if (seeders) serverParts.push(seeders);
         if (size) serverParts.push(size);
-        serverParts.push(uploader || "Torrentio");
+        serverParts.push(uploader || 'Torrentio');
 
-        const serverName = serverParts.join(" •");
+        const serverName = serverParts.join(' •');
 
         if (link) {
           streams.push({
             server: serverName,
             link: link,
-            type: link.startsWith("magnet:") ? "torrent" : "mp4",
+            type: link.startsWith('magnet:') ? 'torrent' : 'mp4',
             quality: quality,
           });
         }
       });
     }
 
-    console.log("Torrentio streams:", streams);
+    console.log('Torrentio streams:', streams);
 
     return streams;
   } catch (err) {
-    throwProviderError("Torrentio", "stream", err);
+    throwProviderError('Torrentio', 'stream', err);
   }
 };

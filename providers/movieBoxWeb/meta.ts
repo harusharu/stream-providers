@@ -1,6 +1,6 @@
-import { getBaseUrl } from "../getBaseUrl";
-import { Info, Link, ProviderContext } from "../types";
-import { throwProviderError } from "../providerErrors";
+import { getBaseUrl } from '../getBaseUrl';
+import { Info, Link, ProviderContext } from '../types';
+import { throwProviderError } from '../providerErrors';
 import {
   absoluteUrl,
   detailPath,
@@ -10,22 +10,21 @@ import {
   MovieBoxSubject,
   parseNuxtDetail,
   providerValue,
-} from "./utils";
+} from './utils';
 
 function buildPlaybackLink(
   subject: MovieBoxSubject,
   dub: MovieBoxDub,
-  seasons: MovieBoxResource["seasons"],
+  seasons: MovieBoxResource['seasons'],
 ): string {
-  const movieSeason =
-    seasons?.find((season) => season.se === 0) || seasons?.[0];
+  const movieSeason = seasons?.find((season) => season.se === 0) || seasons?.[0];
   const movieResolution = movieSeason?.resolutions
     ?.filter((item) => (item.epNum || 0) >= 1)
     .sort((a, b) => (b.resolution || 0) - (a.resolution || 0))[0]?.resolution;
   return encodeLink({
-    subjectId: dub.subjectId || subject.subjectId || "",
-    detailPath: dub.detailPath || subject.detailPath || "",
-    language: dub.lanName || dub.lanCode || "Original",
+    subjectId: dub.subjectId || subject.subjectId || '',
+    detailPath: dub.detailPath || subject.detailPath || '',
+    language: dub.lanName || dub.lanCode || 'Original',
     season: subject.subjectType === 2 ? undefined : movieSeason?.se || 0,
     episode: subject.subjectType === 2 ? undefined : 1,
     resolution: subject.subjectType === 2 ? undefined : movieResolution,
@@ -45,16 +44,11 @@ export const getMeta = async function ({
     const pageUrl = absoluteUrl(baseUrl, `/moviesDetail/${detailPath(link)}`);
     const response = await fetch(pageUrl);
     if (!response.ok) {
-      throw new Error(
-        `HTTP ${response.status} ${response.statusText} | URL ${pageUrl}`,
-      );
+      throw new Error(`HTTP ${response.status} ${response.statusText} | URL ${pageUrl}`);
     }
 
-    const detail = parseNuxtDetail(
-      await response.text(),
-      providerContext.cheerio,
-    );
-    if (!detail) throw new Error("MovieBox Web detail data was not found");
+    const detail = parseNuxtDetail(await response.text(), providerContext.cheerio);
+    if (!detail) throw new Error('MovieBox Web detail data was not found');
 
     const { subject, resource } = detail;
     const isSeries = subject.subjectType === 2;
@@ -64,7 +58,7 @@ export const getMeta = async function ({
           {
             subjectId: subject.subjectId,
             detailPath: subject.detailPath,
-            lanName: "Original",
+            lanName: 'Original',
           },
         ];
     const linkList: Link[] = (subject.hasResource === false ? [] : dubs)
@@ -73,17 +67,17 @@ export const getMeta = async function ({
         const playbackLink = buildPlaybackLink(subject, dub, resource.seasons);
         if (isSeries) {
           return {
-            title: dub.lanName || dub.lanCode || "Original",
+            title: dub.lanName || dub.lanCode || 'Original',
             episodesLink: playbackLink,
           };
         }
         return {
-          title: dub.lanName || dub.lanCode || "Original",
+          title: dub.lanName || dub.lanCode || 'Original',
           directLinks: [
             {
-              title: dub.lanName || dub.lanCode || "Original",
+              title: dub.lanName || dub.lanCode || 'Original',
               link: playbackLink,
-              type: "movie",
+              type: 'movie',
             },
           ],
         };
@@ -92,22 +86,22 @@ export const getMeta = async function ({
     const tags = [
       subject.countryName,
       subject.releaseDate?.slice(0, 4),
-      ...(subject.genre || "").split(",").map((tag) => tag.trim()),
+      ...(subject.genre || '').split(',').map((tag) => tag.trim()),
     ].filter((tag): tag is string => Boolean(tag));
 
     return {
-      title: subject.title || "",
-      image: subject.cover?.url || "",
-      synopsis: subject.description || "",
-      imdbId: "",
-      type: isSeries ? "series" : "movie",
+      title: subject.title || '',
+      image: subject.cover?.url || '',
+      synopsis: subject.description || '',
+      imdbId: '',
+      type: isSeries ? 'series' : 'movie',
       tags,
-      cast: subject.stars?.map((star) => star.name || "").filter(Boolean),
-      rating: subject.imdbRatingValue || "",
+      cast: subject.stars?.map((star) => star.name || '').filter(Boolean),
+      rating: subject.imdbRatingValue || '',
       linkList,
       webUrl: pageUrl,
     };
   } catch (error) {
-    throwProviderError("MovieBox Web", "metadata", error);
+    throwProviderError('MovieBox Web', 'metadata', error);
   }
 };

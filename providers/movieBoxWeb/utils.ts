@@ -1,6 +1,6 @@
-import { ProviderContext } from "../types";
+import { ProviderContext } from '../types';
 
-export const providerValue = "movieBoxWeb";
+export const providerValue = 'movieBoxWeb';
 
 export type MovieBoxSubject = {
   subjectId?: string;
@@ -48,22 +48,19 @@ export type PlaybackLink = {
   season?: number;
   episode?: number;
   resolution?: number;
-  seasons?: MovieBoxResource["seasons"];
+  seasons?: MovieBoxResource['seasons'];
 };
 
 export function parseNuxtDetail(
   html: string,
-  cheerio: ProviderContext["cheerio"],
+  cheerio: ProviderContext['cheerio'],
 ): MovieBoxDetail | null {
   return findDetail(parseNuxtData(html, cheerio));
 }
 
-export function parseNuxtData(
-  html: string,
-  cheerio: ProviderContext["cheerio"],
-): unknown {
+export function parseNuxtData(html: string, cheerio: ProviderContext['cheerio']): unknown {
   const $ = cheerio.load(html);
-  const serialized = $("#__NUXT_DATA__").text();
+  const serialized = $('#__NUXT_DATA__').text();
   if (!serialized) return null;
 
   return decodeNuxtData(JSON.parse(serialized));
@@ -71,7 +68,7 @@ export function parseNuxtData(
 
 function decodeNuxtData(values: unknown): unknown {
   if (!Array.isArray(values) || values.length === 0) {
-    throw new Error("Invalid Nuxt data");
+    throw new Error('Invalid Nuxt data');
   }
 
   const entries = values as unknown[];
@@ -83,15 +80,15 @@ function decodeNuxtData(values: unknown): unknown {
     if (index === -4) return Infinity;
     if (index === -5) return -Infinity;
     if (index === -6) return -0;
-    if (typeof index !== "number" || index < 0 || index >= entries.length) {
-      throw new Error("Invalid Nuxt data index");
+    if (typeof index !== 'number' || index < 0 || index >= entries.length) {
+      throw new Error('Invalid Nuxt data index');
     }
     if (Object.prototype.hasOwnProperty.call(hydrated, index)) {
       return hydrated[index];
     }
 
     const value = entries[index];
-    if (!value || typeof value !== "object") {
+    if (!value || typeof value !== 'object') {
       hydrated[index] = value;
       return value;
     }
@@ -99,16 +96,16 @@ function decodeNuxtData(values: unknown): unknown {
     if (Array.isArray(value)) {
       const type = value[0];
       if (
-        type === "Reactive" ||
-        type === "ShallowReactive" ||
-        type === "Ref" ||
-        type === "ShallowRef"
+        type === 'Reactive' ||
+        type === 'ShallowReactive' ||
+        type === 'Ref' ||
+        type === 'ShallowRef'
       ) {
         const result = hydrate(value[1]);
         hydrated[index] = result;
         return result;
       }
-      if (type === "Set") {
+      if (type === 'Set') {
         const result = new Set<unknown>();
         hydrated[index] = result;
         for (let item = 1; item < value.length; item++) {
@@ -116,7 +113,7 @@ function decodeNuxtData(values: unknown): unknown {
         }
         return result;
       }
-      if (typeof type === "string") {
+      if (typeof type === 'string') {
         throw new Error(`Unsupported Nuxt data type: ${type}`);
       }
 
@@ -131,7 +128,7 @@ function decodeNuxtData(values: unknown): unknown {
     const result: Record<string, unknown> = {};
     hydrated[index] = result;
     for (const [key, item] of Object.entries(value)) {
-      if (key === "__proto__") throw new Error("Invalid Nuxt data key");
+      if (key === '__proto__') throw new Error('Invalid Nuxt data key');
       result[key] = hydrate(item);
     }
     return result;
@@ -141,12 +138,12 @@ function decodeNuxtData(values: unknown): unknown {
 }
 
 function findDetail(value: unknown): MovieBoxDetail | null {
-  if (!value || typeof value !== "object") return null;
+  if (!value || typeof value !== 'object') return null;
   if (
-    "subject" in value &&
-    "resource" in value &&
-    typeof value.subject === "object" &&
-    typeof value.resource === "object"
+    'subject' in value &&
+    'resource' in value &&
+    typeof value.subject === 'object' &&
+    typeof value.resource === 'object'
   ) {
     return value as MovieBoxDetail;
   }
@@ -167,7 +164,7 @@ export function decodeLink(value: string): PlaybackLink {
 }
 
 export function detailPath(link: string): string {
-  return link.replace(/^https?:\/\/[^/]+/, "").replace(/^\/moviesDetail\//, "");
+  return link.replace(/^https?:\/\/[^/]+/, '').replace(/^\/moviesDetail\//, '');
 }
 
 export function absoluteUrl(baseUrl: string, path: string): string {

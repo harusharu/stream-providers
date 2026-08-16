@@ -1,9 +1,9 @@
-import { getBaseUrl } from "../getBaseUrl";
-import { Post, ProviderContext } from "../types";
-import { throwProviderError } from "../providerErrors";
+import { getBaseUrl } from '../getBaseUrl';
+import { Post, ProviderContext } from '../types';
+import { throwProviderError } from '../providerErrors';
 
-const providerValue = "cinefreak";
-const defaultBaseUrl = "https://cinefreak.net";
+const providerValue = 'cinefreak';
+const defaultBaseUrl = 'https://cinefreak.net';
 
 function toPath(link: string, baseUrl: string): string {
   try {
@@ -30,21 +30,21 @@ async function fetchPosts(
       signal,
     });
 
-    const $ = cheerio.load(response.data || "");
+    const $ = cheerio.load(response.data || '');
     const posts: Post[] = [];
 
-    $(".movie-card").each((_, element) => {
+    $('.movie-card').each((_, element) => {
       const card = $(element);
-      const link = card.attr("href") || card.find("a").attr("href") || "";
-      const image =
-        card.find("img").attr("src") ||
-        card.find("img").attr("data-src") ||
-        "";
+      const link = card.attr('href') || card.find('a').attr('href') || '';
+      const image = card.find('img').attr('src') || card.find('img').attr('data-src') || '';
       const title =
-        card.find(".movie-card-title").text().replace(/\s+/g, " ").trim() ||
-        card.attr("aria-label")?.replace(/ details$/i, "")?.trim() ||
-        card.find("img").attr("alt")?.trim() ||
-        "";
+        card.find('.movie-card-title').text().replace(/\s+/g, ' ').trim() ||
+        card
+          .attr('aria-label')
+          ?.replace(/ details$/i, '')
+          ?.trim() ||
+        card.find('img').attr('alt')?.trim() ||
+        '';
 
       if (title && link) {
         posts.push({
@@ -57,7 +57,7 @@ async function fetchPosts(
 
     return posts;
   } catch (error: any) {
-    throwProviderError("CineFreak", "posts", error);
+    throwProviderError('CineFreak', 'posts', error);
     return [];
   }
 }
@@ -75,11 +75,9 @@ export async function getPosts({
   providerContext: ProviderContext;
 }): Promise<Post[]> {
   const baseUrl = (await getBaseUrl(providerValue)) || defaultBaseUrl;
-  const cleanFilter = filter ? filter.replace(/\/+$/, "") : "";
+  const cleanFilter = filter ? filter.replace(/\/+$/, '') : '';
   const pageUrl =
-    page <= 1
-      ? `${baseUrl}${cleanFilter}/`
-      : `${baseUrl}${cleanFilter}/page/${page}/`;
+    page <= 1 ? `${baseUrl}${cleanFilter}/` : `${baseUrl}${cleanFilter}/page/${page}/`;
 
   return fetchPosts(pageUrl, baseUrl, signal, providerContext);
 }
@@ -99,9 +97,7 @@ export async function getSearchPosts({
   const baseUrl = (await getBaseUrl(providerValue)) || defaultBaseUrl;
   const encodedQuery = encodeURIComponent(searchQuery.trim());
   const searchUrl =
-    page <= 1
-      ? `${baseUrl}/?s=${encodedQuery}`
-      : `${baseUrl}/page/${page}/?s=${encodedQuery}`;
+    page <= 1 ? `${baseUrl}/?s=${encodedQuery}` : `${baseUrl}/page/${page}/?s=${encodedQuery}`;
 
   return fetchPosts(searchUrl, baseUrl, signal, providerContext);
 }

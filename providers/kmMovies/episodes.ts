@@ -1,18 +1,14 @@
-import { EpisodeLink, ProviderContext } from "../types";
-import { throwProviderError } from "../providerErrors";
-import {
-  enrichCinemetaEpisodes,
-  getCinemetaMeta,
-  readCinemetaContext,
-} from "../getCinemetaMeta";
+import { EpisodeLink, ProviderContext } from '../types';
+import { throwProviderError } from '../providerErrors';
+import { enrichCinemetaEpisodes, getCinemetaMeta, readCinemetaContext } from '../getCinemetaMeta';
 
 const headers = {
-  "User-Agent":
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0",
-  Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-  "Accept-Language": "en-US,en;q=0.9",
-  Pragma: "no-cache",
-  "Cache-Control": "no-cache",
+  'User-Agent':
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0',
+  Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+  'Accept-Language': 'en-US,en;q=0.9',
+  Pragma: 'no-cache',
+  'Cache-Control': 'no-cache',
 };
 
 export const getEpisodes = async function ({
@@ -30,8 +26,8 @@ export const getEpisodes = async function ({
     const episodes: EpisodeLink[] = [];
 
     let epCount = 1;
-    $("a.dl-btn").each((_, el) => {
-      const href = $(el).attr("href");
+    $('a.dl-btn').each((_, el) => {
+      const href = $(el).attr('href');
       if (href) {
         episodes.push({
           title: `Episode ${epCount}`,
@@ -43,17 +39,9 @@ export const getEpisodes = async function ({
 
     if (!context.imdbId || !context.season) return episodes;
 
-    const cinemeta = await getCinemetaMeta(
-      context.imdbId,
-      "series",
-      providerContext,
-    );
-    return enrichCinemetaEpisodes(
-      episodes,
-      cinemeta.videos || [],
-      context.season,
-    );
+    const cinemeta = await getCinemetaMeta(context.imdbId, 'series', providerContext);
+    return enrichCinemetaEpisodes(episodes, cinemeta.videos || [], context.season);
   } catch (err) {
-    throwProviderError("KMMovies", "episodes", err);
+    throwProviderError('KMMovies', 'episodes', err);
   }
 };

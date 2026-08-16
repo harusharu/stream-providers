@@ -1,6 +1,6 @@
-import { getBaseUrl } from "../getBaseUrl";
-import { Post, ProviderContext } from "../types";
-import { absoluteUrl, parseNuxtData, providerValue } from "./utils";
+import { getBaseUrl } from '../getBaseUrl';
+import { Post, ProviderContext } from '../types';
+import { absoluteUrl, parseNuxtData, providerValue } from './utils';
 
 type SubjectPreview = {
   detailPath?: string;
@@ -24,9 +24,9 @@ type SubjectListResponse = {
 
 const pageSize = 18;
 const requestHeaders = {
-  Accept: "application/json",
-  "x-client-info": JSON.stringify({ timezone: "Asia/Colombo" }),
-  "x-source": "",
+  Accept: 'application/json',
+  'x-client-info': JSON.stringify({ timezone: 'Asia/Colombo' }),
+  'x-source': '',
 };
 
 function collectSubjectPreviews(value: unknown): Map<string, SubjectPreview> {
@@ -34,25 +34,19 @@ function collectSubjectPreviews(value: unknown): Map<string, SubjectPreview> {
   const visited = new Set<object>();
 
   function visit(current: unknown): void {
-    if (!current || typeof current !== "object" || visited.has(current)) return;
+    if (!current || typeof current !== 'object' || visited.has(current)) return;
     visited.add(current);
 
-    if ("detailPath" in current && typeof current.detailPath === "string") {
-      const cover = "cover" in current ? current.cover : undefined;
+    if ('detailPath' in current && typeof current.detailPath === 'string') {
+      const cover = 'cover' in current ? current.cover : undefined;
       subjects.set(current.detailPath, {
-        title:
-          "title" in current && typeof current.title === "string"
-            ? current.title
-            : undefined,
+        title: 'title' in current && typeof current.title === 'string' ? current.title : undefined,
         coverUrl:
-          cover &&
-          typeof cover === "object" &&
-          "url" in cover &&
-          typeof cover.url === "string"
+          cover && typeof cover === 'object' && 'url' in cover && typeof cover.url === 'string'
             ? cover.url
             : undefined,
         hasResource:
-          "hasResource" in current && typeof current.hasResource === "boolean"
+          'hasResource' in current && typeof current.hasResource === 'boolean'
             ? current.hasResource
             : undefined,
       });
@@ -75,39 +69,36 @@ async function fetchPosts(
 
   const html = await response.text();
   const $ = providerContext.cheerio.load(html);
-  const subjects = collectSubjectPreviews(
-    parseNuxtData(html, providerContext.cheerio),
-  );
+  const subjects = collectSubjectPreviews(parseNuxtData(html, providerContext.cheerio));
   const posts: Post[] = [];
   const seen = new Set<string>();
 
   $('a[href^="/moviesDetail/"]').each((_, element) => {
     const card = $(element);
-    const href = card.attr("href") || "";
-    if (!href.startsWith("/moviesDetail/") || seen.has(href)) return;
-    const subject = subjects.get(href.replace("/moviesDetail/", ""));
-    if (path === "/upcoming" && subject?.hasResource !== true) return;
+    const href = card.attr('href') || '';
+    if (!href.startsWith('/moviesDetail/') || seen.has(href)) return;
+    const subject = subjects.get(href.replace('/moviesDetail/', ''));
+    if (path === '/upcoming' && subject?.hasResource !== true) return;
 
-    const image = card.find("img").first();
+    const image = card.find('img').first();
     const title =
       subject?.title?.trim() ||
-      card.find("h2, h3").first().attr("title")?.trim() ||
-      image.attr("alt")?.trim() ||
-      card.find("h2, h3").first().text().trim() ||
+      card.find('h2, h3').first().attr('title')?.trim() ||
+      image.attr('alt')?.trim() ||
+      card.find('h2, h3').first().text().trim() ||
       card
-        .attr("title")
-        ?.replace(/^go to /i, "")
-        .replace(/ detail page$/i, "")
+        .attr('title')
+        ?.replace(/^go to /i, '')
+        .replace(/ detail page$/i, '')
         .trim() ||
-      "";
+      '';
     if (!title) return;
 
     seen.add(href);
     posts.push({
       title,
       link: href,
-      image:
-        image.attr("data-src") || subject?.coverUrl || image.attr("src") || "",
+      image: image.attr('data-src') || subject?.coverUrl || image.attr('src') || '',
     });
   });
   return posts;
@@ -116,14 +107,12 @@ async function fetchPosts(
 function mapSubjects(subjects: SubjectPreview[]): Post[] {
   return subjects
     .filter(
-      (subject) =>
-        Boolean(subject.detailPath && subject.title) &&
-        subject.hasResource !== false,
+      (subject) => Boolean(subject.detailPath && subject.title) && subject.hasResource !== false,
     )
     .map((subject) => ({
-      title: subject.title || "",
+      title: subject.title || '',
       link: `/moviesDetail/${subject.detailPath}`,
-      image: subject.coverUrl || "",
+      image: subject.coverUrl || '',
     }));
 }
 
@@ -137,22 +126,19 @@ async function fetchCatalogPage(
     page: String(Math.max(1, page)),
     perPage: String(pageSize),
   });
-  if (filter === "/newWeb/movie") {
-    params.set("tabId", "ONEROOM_MOVIE");
+  if (filter === '/newWeb/movie') {
+    params.set('tabId', 'ONEROOM_MOVIE');
   }
 
   const response = await fetch(
-    absoluteUrl(
-      baseUrl,
-      `/wefeed-h5api-bff/subject/trending?${params.toString()}`,
-    ),
+    absoluteUrl(baseUrl, `/wefeed-h5api-bff/subject/trending?${params.toString()}`),
     { headers: requestHeaders, signal },
   );
   if (!response.ok) throw new Error(`MovieBox Web returned ${response.status}`);
 
   const payload = (await response.json()) as SubjectListResponse;
   if (payload.code !== 0) {
-    throw new Error(payload.message || "MovieBox Web catalog request failed");
+    throw new Error(payload.message || 'MovieBox Web catalog request failed');
   }
   return mapSubjects(
     (payload.data?.subjectList || []).map((subject) => ({
@@ -176,8 +162,8 @@ export const getPosts = async function ({
   signal: AbortSignal;
   providerContext: ProviderContext;
 }): Promise<Post[]> {
-  const path = filter || "/";
-  if (["/", "/newWeb/movie", "/newWeb/tv-series"].includes(path)) {
+  const path = filter || '/';
+  if (['/', '/newWeb/movie', '/newWeb/tv-series'].includes(path)) {
     return fetchCatalogPage(path, page, signal);
   }
   if (page > 1) return [];
