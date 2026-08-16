@@ -125,7 +125,7 @@
 const API_BASE = (() => {
   const q = new URLSearchParams(location.search).get("api");
   if (q) return q.replace(/\/+$/, "");
-  if (location.protocol === "file:") return "http://localhost:8791";
+  if (location.protocol === "file:") return "http://localhost:8787";
   return "";
 })();
 
@@ -167,7 +167,7 @@ async function refreshHealth() {
     $("statStatus").textContent = "down";
     $("healthText").textContent = "unreachable";
     $("healthDot").className = "dot degraded";
-    showError(`API unreachable (${API_BASE || "same origin"}): ${err.message || err} — start the gateway on :8787 (Rust) or :8791 (Node), or open this page with ?api=http://host:port`);
+    showError(`API unreachable (${API_BASE || "same origin"}): ${err.message || err} — start a gateway on :8787 (just dev / just dev-node), or open this page with ?api=http://host:port`);
   }
 }
 
