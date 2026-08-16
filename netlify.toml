@@ -1,0 +1,27 @@
+# Netlify deployment config for the Node.js API gateway (netlify-functions/).
+#
+# Only `netlify-functions/api.ts` is deployed as a function. All support modules
+# live in `netlify-functions/lib/` so Netlify does not treat them as functions.
+# The function routes every path (`config.path = "/*"` in api.ts) and is
+# fronted by the static dashboard in `static/` via CDN redirects below.
+
+[build]
+  command = "npm --prefix netlify-functions ci && npm --prefix netlify-functions run typecheck"
+  publish = "static"
+
+[functions]
+  directory = "netlify-functions"
+  node_bundler = "esbuild"
+  # curl-cffi-node ships a native binary; esbuild must leave it external.
+  # axios/cheerio are pure JS and get bundled into the artifact.
+  external_node_modules = ["curl-cffi-node"]
+  # Provider bundles + runtime data the gateway executes/scrapes at runtime.
+  included_files = [
+    "dist/**/*.js",
+    "urls.json",
+    "manifest.json",
+    "static/index.html",
+  ]
+
+# Serve the static dashboard from the CDN; the function handles everything else.
+# (`preferStatic: true` in netlify-functions/api.ts lets static files win.)
