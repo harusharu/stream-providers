@@ -12,4 +12,3 @@ doc/.mdbook
 .claude/
 skills-lock.json
 .vercel
-netlify-functions/api.vercel.mjs
