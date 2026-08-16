@@ -2,6 +2,7 @@ node_modules/
 build/
 *.log
 *.env
+*.env.local
 !dist
 target/
 doc/book/
