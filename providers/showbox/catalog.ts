@@ -1,15 +1,15 @@
 export const catalog = [
   {
-    title: "Home",
-    filter: "",
+    title: 'Home',
+    filter: '',
   },
   {
-    title: "Movies",
-    filter: "/movie",
+    title: 'Movies',
+    filter: '/movie',
   },
   {
-    title: "TV Shows",
-    filter: "/tv",
+    title: 'TV Shows',
+    filter: '/tv',
   },
 ];
 

@@ -1,1 +1,1 @@
-export * from "../autoEmbed/posts";
+export * from '../autoEmbed/posts';

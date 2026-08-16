@@ -1,19 +1,17 @@
-const esbuild = require("esbuild");
-const fs = require("fs");
-const path = require("path");
-const { minify } = require("terser");
+const esbuild = require('esbuild');
+const fs = require('fs');
+const path = require('path');
+const { minify } = require('terser');
 
-const SKIP_MINIFY = process.env.SKIP_MINIFY === "true";
+const SKIP_MINIFY = process.env.SKIP_MINIFY === 'true';
 
 // Find all provider directories
-const providersDir = path.join(__dirname, "providers");
+const providersDir = path.join(__dirname, 'providers');
 const providerDirs = fs
   .readdirSync(providersDir, { withFileTypes: true })
   .filter(
     (dirent) =>
-      dirent.isDirectory() &&
-      !dirent.name.startsWith(".") &&
-      dirent.name !== "extractors",
+      dirent.isDirectory() && !dirent.name.startsWith('.') && dirent.name !== 'extractors',
   )
   .map((dirent) => dirent.name);
 
@@ -21,14 +19,14 @@ console.log(`Found ${providerDirs.length} providers to build`);
 
 async function buildProvider(providerName) {
   const providerPath = path.join(providersDir, providerName);
-  const distPath = path.join(__dirname, "dist", providerName);
+  const distPath = path.join(__dirname, 'dist', providerName);
 
   // Create dist directory
   if (!fs.existsSync(distPath)) {
     fs.mkdirSync(distPath, { recursive: true });
   }
 
-  const modules = ["catalog", "posts", "meta", "stream", "episodes"];
+  const modules = ['catalog', 'posts', 'meta', 'stream', 'episodes'];
   const results = [];
 
   for (const moduleName of modules) {
@@ -43,9 +41,9 @@ async function buildProvider(providerName) {
       const result = await esbuild.build({
         entryPoints: [modulePath],
         bundle: true,
-        platform: "node",
-        format: "cjs",
-        target: "es2015",
+        platform: 'node',
+        format: 'cjs',
+        target: 'es2015',
         write: false,
         external: [],
         minify: false,
@@ -58,7 +56,7 @@ async function buildProvider(providerName) {
 
       // Post-process the code for React Native compatibility
       // Remove require statements for built-in modules that aren't available
-      code = code.replace(/require\(['"]node:.*?['"]\)/g, "{}");
+      code = code.replace(/require\(['"]node:.*?['"]\)/g, '{}');
 
       const exportMatch = code.match(/__export\((\w+),\s*\{([^}]+)\}\);/);
 
@@ -68,7 +66,7 @@ async function buildProvider(providerName) {
 
         // Parse the export entries like "funcName: () => funcName"
         const exportEntries = exportsContent
-          .split(",")
+          .split(',')
           .map((entry) => {
             const match = entry.trim().match(/(\w+):\s*\(\)\s*=>\s*(\w+)/);
             return match ? match[1] : null;
@@ -76,15 +74,10 @@ async function buildProvider(providerName) {
           .filter(Boolean);
 
         // Replace module.exports pattern
-        code = code.replace(
-          /module\.exports\s*=\s*__toCommonJS\((\w+)\);/g,
-          "",
-        );
+        code = code.replace(/module\.exports\s*=\s*__toCommonJS\((\w+)\);/g, '');
 
         // Add direct exports assignments at the end
-        const directExports = exportEntries
-          .map((name) => `exports.${name} = ${name};`)
-          .join("\n");
+        const directExports = exportEntries.map((name) => `exports.${name} = ${name};`).join('\n');
 
         // Add the exports before the final comment
         code = code.replace(
@@ -94,10 +87,7 @@ async function buildProvider(providerName) {
       }
 
       // Also handle the "0 && (module.exports = {...})" pattern at the end
-      code = code.replace(
-        /0\s*&&\s*\(module\.exports\s*=\s*\{[^}]*\}\);?/g,
-        "",
-      );
+      code = code.replace(/0\s*&&\s*\(module\.exports\s*=\s*\{[^}]*\}\);?/g, '');
 
       // Minify if not skipped
       if (!SKIP_MINIFY) {
@@ -136,14 +126,9 @@ async function buildProvider(providerName) {
         size: code.length,
       });
 
-      console.log(
-        `✓ ${providerName}/${moduleName}.js (${(code.length / 1024).toFixed(1)}kb)`,
-      );
+      console.log(`✓ ${providerName}/${moduleName}.js (${(code.length / 1024).toFixed(1)}kb)`);
     } catch (error) {
-      console.error(
-        `✗ Error building ${providerName}/${moduleName}:`,
-        error.message,
-      );
+      console.error(`✗ Error building ${providerName}/${moduleName}:`, error.message);
     }
   }
 
@@ -151,7 +136,7 @@ async function buildProvider(providerName) {
 }
 
 async function buildUtilityFiles() {
-  const utilityFiles = ["headers", "providerContext"];
+  const utilityFiles = ['headers', 'providerContext'];
 
   for (const utilityName of utilityFiles) {
     const utilityPath = path.join(providersDir, `${utilityName}.ts`);
@@ -164,9 +149,9 @@ async function buildUtilityFiles() {
       const result = await esbuild.build({
         entryPoints: [utilityPath],
         bundle: true,
-        platform: "node",
-        format: "cjs",
-        target: "es2015",
+        platform: 'node',
+        format: 'cjs',
+        target: 'es2015',
         write: false,
         external: [],
         minify: false,
@@ -176,9 +161,9 @@ async function buildUtilityFiles() {
       });
 
       let code = result.outputFiles[0].text;
-      code = code.replace(/require\(['"]node:.*?['"]\)/g, "{}");
+      code = code.replace(/require\(['"]node:.*?['"]\)/g, '{}');
 
-      const outputPath = path.join(__dirname, "dist", `${utilityName}.js`);
+      const outputPath = path.join(__dirname, 'dist', `${utilityName}.js`);
       fs.writeFileSync(outputPath, code);
 
       console.log(`✓ ${utilityName}.js (${(code.length / 1024).toFixed(1)}kb)`);
@@ -190,12 +175,10 @@ async function buildUtilityFiles() {
 
 async function buildAll() {
   const startTime = Date.now();
-  console.log(
-    `Building providers${SKIP_MINIFY ? " (without minification)" : ""}...\n`,
-  );
+  console.log(`Building providers${SKIP_MINIFY ? ' (without minification)' : ''}...\n`);
 
   // Clear dist directory
-  const distDir = path.join(__dirname, "dist");
+  const distDir = path.join(__dirname, 'dist');
   if (fs.existsSync(distDir)) {
     fs.rmSync(distDir, { recursive: true, force: true });
   }
@@ -208,10 +191,7 @@ async function buildAll() {
   const results = await Promise.all(providerDirs.map(buildProvider));
 
   const totalModules = results.reduce((sum, r) => sum + r.modules.length, 0);
-  const totalSize = results.reduce(
-    (sum, r) => sum + r.modules.reduce((s, m) => s + m.size, 0),
-    0,
-  );
+  const totalSize = results.reduce((sum, r) => sum + r.modules.reduce((s, m) => s + m.size, 0), 0);
 
   const endTime = Date.now();
   console.log(
@@ -221,6 +201,6 @@ async function buildAll() {
 }
 
 buildAll().catch((error) => {
-  console.error("Build failed:", error);
+  console.error('Build failed:', error);
   process.exit(1);
 });

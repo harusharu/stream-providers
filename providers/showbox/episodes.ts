@@ -1,5 +1,5 @@
-import { EpisodeLink, ProviderContext } from "../types";
-import { throwProviderError } from "../providerErrors";
+import { EpisodeLink, ProviderContext } from '../types';
+import { throwProviderError } from '../providerErrors';
 
 export const getEpisodes = async function ({
   url: id,
@@ -10,7 +10,7 @@ export const getEpisodes = async function ({
 }): Promise<EpisodeLink[]> {
   const { axios } = providerContext;
   try {
-    const [fileId, febboxId] = id.split("&");
+    const [fileId, febboxId] = id.split('&');
     const febLink = febboxId
       ? `https://www.febbox.com/file/file_share_list?share_key=${fileId}&pwd=&parent_id=${febboxId}&is_html=0`
       : `https://www.febbox.com/file/file_share_list?share_key=${fileId}&pwd=&is_html=0`;
@@ -30,7 +30,7 @@ export const getEpisodes = async function ({
     });
     return episodeLinks;
   } catch (err) {
-    throwProviderError("ShowBox", "episodes", err);
+    throwProviderError('ShowBox', 'episodes', err);
   }
 };
 
@@ -38,8 +38,8 @@ function formatEpisodeName(title: string): string {
   const regex = /[sS](\d+)\s*[eE](\d+)/;
   const match = title.match(regex);
   if (match) {
-    const season = match[1].padStart(2, "0");
-    const episode = match[2].padStart(2, "0");
+    const season = match[1].padStart(2, '0');
+    const episode = match[2].padStart(2, '0');
     return `Season${season} Episode${episode}`;
   } else {
     return title;

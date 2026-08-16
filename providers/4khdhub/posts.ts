@@ -1,6 +1,6 @@
-import { Post, ProviderContext } from "../types";
-import { getBaseUrl } from "../getBaseUrl";
-import { throwProviderError } from "../providerErrors";
+import { Post, ProviderContext } from '../types';
+import { getBaseUrl } from '../getBaseUrl';
+import { throwProviderError } from '../providerErrors';
 
 export const getPosts = async function ({
   filter,
@@ -15,10 +15,10 @@ export const getPosts = async function ({
   providerContext: ProviderContext;
 }): Promise<Post[]> {
   const { cheerio } = providerContext;
-  const baseUrl = await getBaseUrl("4khdhub");
+  const baseUrl = await getBaseUrl('4khdhub');
   const url = `${baseUrl + filter}/page/${page}`;
-  console.log("4khdhubGetPosts url", url);
-  return posts({ baseUrl, url, signal, cheerio, operation: "posts" });
+  console.log('4khdhubGetPosts url', url);
+  return posts({ baseUrl, url, signal, cheerio, operation: 'posts' });
 };
 
 export const getSearchPosts = async function ({
@@ -34,13 +34,11 @@ export const getSearchPosts = async function ({
   providerContext: ProviderContext;
 }): Promise<Post[]> {
   const { cheerio } = providerContext;
-  const baseUrl = await getBaseUrl("4khdhub");
+  const baseUrl = await getBaseUrl('4khdhub');
   const url =
-    page == 1
-      ? `${baseUrl}/?s=${searchQuery}`
-      : `${baseUrl}/page/${page}?s=${searchQuery}`;
-  console.log("4khdhubGetSearchPosts url", url);
-  return posts({ baseUrl, url, signal, cheerio, operation: "search posts" });
+    page == 1 ? `${baseUrl}/?s=${searchQuery}` : `${baseUrl}/page/${page}?s=${searchQuery}`;
+  console.log('4khdhubGetSearchPosts url', url);
+  return posts({ baseUrl, url, signal, cheerio, operation: 'search posts' });
 };
 
 async function posts({
@@ -53,7 +51,7 @@ async function posts({
   baseUrl: string;
   url: string;
   signal: AbortSignal;
-  cheerio: ProviderContext["cheerio"];
+  cheerio: ProviderContext['cheerio'];
   operation: string;
 }): Promise<Post[]> {
   try {
@@ -64,12 +62,12 @@ async function posts({
     const data = await res.text();
     const $ = cheerio.load(data);
     const catalog: Post[] = [];
-    $(".card-grid")
+    $('.card-grid')
       .children()
       .map((i, element) => {
-        const title = $(element).find(".movie-card-title").text();
-        const link = $(element).attr("href");
-        const image = $(element).find("img").attr("src");
+        const title = $(element).find('.movie-card-title').text();
+        const link = $(element).attr('href');
+        const image = $(element).find('img').attr('src');
         // console.log(
         //   "4khdhubGetPosts title",
         //   title,
@@ -89,6 +87,6 @@ async function posts({
       });
     return catalog;
   } catch (err) {
-    throwProviderError("4KHDHub", operation, err);
+    throwProviderError('4KHDHub', operation, err);
   }
 }

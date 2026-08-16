@@ -35,6 +35,8 @@ pub async fn info(state: Data<AppState>) -> HttpResponse {
             "GET /api/stream?provider=&link=&type=",
             "GET /health",
             "GET /providers",
+            "GET /api/providers",
+            "GET /urls.json",
         ],
     }))
 }
@@ -47,7 +49,39 @@ pub async fn providers(state: Data<AppState>) -> HttpResponse {
     }))
 }
 
-/// `GET /` — the self-contained human dashboard (see `static/index.html`).
+/// `GET /api/providers` — same data as `/providers`, wrapped in the standard
+/// `{ success, data }` envelope (mirrors the Node gateway route).
+pub async fn api_providers(state: Data<AppState>) -> HttpResponse {
+    HttpResponse::Ok().json(json!({
+        "success": true,
+        "data": state.manifest.entries,
+    }))
+}
+
+/// `GET /urls.json` — the provider URL manifest (upstream base URLs), read
+/// from `PROVIDERS_ROOT/urls.json`. Lets deployments host their own copy and
+/// point `URLS_MANIFEST_URL` at this endpoint instead of GitHub. Exempt from
+/// rate limiting.
+pub async fn urls_manifest(state: Data<AppState>) -> HttpResponse {
+    let path = state.config.providers_root.join("urls.json");
+    match std::fs::read_to_string(&path) {
+        Ok(raw) => match serde_json::from_str::<serde_json::Value>(&raw) {
+            Ok(json) => HttpResponse::Ok()
+                .insert_header(("Cache-Control", "public, max-age=300"))
+                .json(json),
+            Err(_) => HttpResponse::NotFound().json(json!({
+                "success": false,
+                "error": "invalid urls.json",
+                "code": "NOT_FOUND",
+            })),
+        },
+        Err(_) => HttpResponse::NotFound().json(json!({
+            "success": false,
+            "error": "urls.json not found",
+            "code": "NOT_FOUND",
+        })),
+    }
+}/// `GET /` — the self-contained human dashboard (see `static/index.html`).
 /// Exempt from rate limiting.
 pub async fn dashboard() -> HttpResponse {
     HttpResponse::Ok()

@@ -136,10 +136,7 @@ pub async fn search_all(
         "failed": failed,
     });
     state.caches.search.set(key, data.clone()).await;
-    let ttl = state.caches.search.ttl().as_secs();
-    Ok(HttpResponse::Ok()
-        .insert_header(("Cache-Control", format!("public, max-age={ttl}")))
-        .json(data))
+    Ok(cached(data, state.caches.search.ttl().as_secs()))
 }
 
 /// Pick the manifest entries to query: the requested `providers` subset

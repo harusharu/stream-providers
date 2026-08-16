@@ -10,6 +10,7 @@
 //! | `HOST` | `0.0.0.0` | Bind address |
 //! | `PORT` | `8787` | Bind port |
 //! | `PROVIDERS_ROOT` | repo root (cwd) | Repo root containing `dist/` + `urls.json` |
+//! | `URLS_MANIFEST_URL` | unset | Manifest endpoint for `getBaseUrl()` (set in `.env`); local copy fallback on failure |
 //! | `DEFAULT_PROVIDER` | `vega` | Provider id used when `provider` is omitted |
 //! | `WORKER_COUNT` | CPU count | Number of Node sidecar processes |
 //! | `CALL_TIMEOUT_MS` | `75000` | Rust-side per-call timeout (hard cap) |

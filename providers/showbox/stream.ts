@@ -1,5 +1,5 @@
-import { Stream, ProviderContext } from "../types";
-import { throwProviderError } from "../providerErrors";
+import { Stream, ProviderContext } from '../types';
+import { throwProviderError } from '../providerErrors';
 
 export const getStream = async function ({
   link: id,
@@ -15,23 +15,23 @@ export const getStream = async function ({
   try {
     const { axios, cheerio } = providerContext;
     const stream: Stream[] = [];
-    const [, epId] = id.split("&");
+    const [, epId] = id.split('&');
     const url = `https://feb.8man.workers.dev/?fid=${epId}`;
     const res = await axios.get(url, { signal });
     const data = res.data;
     const $ = cheerio.load(data.html);
-    $(".file_quality").each((i, el) => {
+    $('.file_quality').each((i, el) => {
       const server =
-        $(el).find("p.name").text() +
-        " - " +
-        $(el).find("p.size").text() +
-        " - " +
-        $(el).find("p.speed").text();
-      const link = $(el).attr("data-url");
+        $(el).find('p.name').text() +
+        ' - ' +
+        $(el).find('p.size').text() +
+        ' - ' +
+        $(el).find('p.speed').text();
+      const link = $(el).attr('data-url');
       if (link) {
         stream.push({
           server: server,
-          type: "mkv",
+          type: 'mkv',
           link: link,
         });
       }
@@ -39,6 +39,6 @@ export const getStream = async function ({
     console.log(stream);
     return stream;
   } catch (err) {
-    throwProviderError("ShowBox", "stream", err);
+    throwProviderError('ShowBox', 'stream', err);
   }
 };

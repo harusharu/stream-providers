@@ -1,7 +1,7 @@
-import { getBaseUrl } from "../getBaseUrl";
-import { Post, ProviderContext } from "../types";
+import { getBaseUrl } from '../getBaseUrl';
+import { Post, ProviderContext } from '../types';
 
-const providerValue = "eonMovies";
+const providerValue = 'eonMovies';
 
 function toPath(link: string, baseUrl: string): string {
   const url = new URL(link, `${baseUrl}/`);
@@ -15,21 +15,18 @@ async function fetchPosts(
   providerContext: ProviderContext,
 ): Promise<Post[]> {
   const response = await providerContext.axios.get(url, { signal });
-  const $ = providerContext.cheerio.load(response.data || "");
+  const $ = providerContext.cheerio.load(response.data || '');
   const posts: Post[] = [];
 
-  $(".image-container").each((_, element) => {
+  $('.image-container').each((_, element) => {
     const container = $(element);
-    const anchor = container.closest("a[href]");
-    const link = anchor.attr("href") || "";
-    const image =
-      container.find("img").attr("data-src") ||
-      container.find("img").attr("src") ||
-      "";
+    const anchor = container.closest('a[href]');
+    const link = anchor.attr('href') || '';
+    const image = container.find('img').attr('data-src') || container.find('img').attr('src') || '';
     const title =
-      anchor.find(".card-title").text().replace(/\s+/g, " ").trim() ||
-      container.find("img").attr("alt") ||
-      "";
+      anchor.find('.card-title').text().replace(/\s+/g, ' ').trim() ||
+      container.find('img').attr('alt') ||
+      '';
 
     if (title && link && image) {
       posts.push({ title, link: toPath(link, baseUrl), image });
@@ -52,11 +49,11 @@ export async function getPosts({
   providerContext: ProviderContext;
 }): Promise<Post[]> {
   const baseUrl = await getBaseUrl(providerValue);
-  const url = new URL("/", `${baseUrl}/`);
+  const url = new URL('/', `${baseUrl}/`);
   url.search = new URLSearchParams({
-    action: "",
+    action: '',
     page: String(page),
-    name: "",
+    name: '',
     category: filter,
   }).toString();
   return fetchPosts(url.href, baseUrl, signal, providerContext);
@@ -75,9 +72,9 @@ export async function getSearchPosts({
   providerContext: ProviderContext;
 }): Promise<Post[]> {
   const baseUrl = await getBaseUrl(providerValue);
-  const url = new URL("/", `${baseUrl}/`);
+  const url = new URL('/', `${baseUrl}/`);
   url.search = new URLSearchParams({
-    action: "search",
+    action: 'search',
     page: String(page),
     name: searchQuery,
   }).toString();

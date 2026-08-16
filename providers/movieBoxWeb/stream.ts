@@ -1,7 +1,7 @@
-import { getBaseUrl } from "../getBaseUrl";
-import { ProviderContext, Stream, TextTracks } from "../types";
-import { throwProviderError } from "../providerErrors";
-import { absoluteUrl, decodeLink, providerValue } from "./utils";
+import { getBaseUrl } from '../getBaseUrl';
+import { ProviderContext, Stream, TextTracks } from '../types';
+import { throwProviderError } from '../providerErrors';
+import { absoluteUrl, decodeLink, providerValue } from './utils';
 
 type PlayStream = {
   format?: string;
@@ -18,39 +18,37 @@ type Caption = {
 };
 
 const requestHeaders = {
-  Accept: "application/json",
-  "x-client-info": JSON.stringify({ timezone: "Asia/Colombo" }),
-  "x-source": "",
+  Accept: 'application/json',
+  'x-client-info': JSON.stringify({ timezone: 'Asia/Colombo' }),
+  'x-source': '',
 };
 
-function getQuality(resolutions?: string): Stream["quality"] {
-  const values = (resolutions || "")
-    .split(",")
+function getQuality(resolutions?: string): Stream['quality'] {
+  const values = (resolutions || '')
+    .split(',')
     .map(Number)
     .filter((value) => [360, 480, 720, 1080, 2160].includes(value));
   const quality = Math.max(...values);
-  return Number.isFinite(quality)
-    ? (String(quality) as Stream["quality"])
-    : undefined;
+  return Number.isFinite(quality) ? (String(quality) as Stream['quality']) : undefined;
 }
 
 function getStreamType(format?: string): string {
   const normalized = format?.toUpperCase();
-  if (normalized === "HLS" || normalized === "M3U8") return "m3u8";
-  if (normalized === "DASH") return "mpd";
-  return "mp4";
+  if (normalized === 'HLS' || normalized === 'M3U8') return 'm3u8';
+  if (normalized === 'DASH') return 'mpd';
+  return 'mp4';
 }
 
 function mapCaptions(captions: Caption[]): TextTracks {
   return captions
     .filter((caption) => Boolean(caption.url))
     .map((caption) => ({
-      title: caption.lanName || caption.lan || "Subtitle",
-      language: caption.lan || "und",
-      type: caption.url?.includes(".vtt")
-        ? ("text/vtt" as const)
-        : ("application/x-subrip" as const),
-      uri: caption.url || "",
+      title: caption.lanName || caption.lan || 'Subtitle',
+      language: caption.lan || 'und',
+      type: caption.url?.includes('.vtt')
+        ? ('text/vtt' as const)
+        : ('application/x-subrip' as const),
+      uri: caption.url || '',
     }));
 }
 
@@ -68,17 +66,12 @@ async function getCaptions(
     subjectId: playback.subjectId,
     detailPath: playback.detailPath,
   });
-  const url = absoluteUrl(
-    baseUrl,
-    `/wefeed-h5api-bff/subject/caption?${params}`,
-  );
+  const url = absoluteUrl(baseUrl, `/wefeed-h5api-bff/subject/caption?${params}`);
   const response = await fetch(url, {
     headers: { ...requestHeaders, Referer: referer },
   });
   if (!response.ok) {
-    throw new Error(
-      `HTTP ${response.status} ${response.statusText} | URL ${url}`,
-    );
+    throw new Error(`HTTP ${response.status} ${response.statusText} | URL ${url}`);
   }
 
   const data = await response.json();
@@ -96,62 +89,49 @@ export const getStream = async function ({
     const baseUrl = await getBaseUrl(providerValue);
     const watchParams = new URLSearchParams({
       id: playback.subjectId,
-      type: "/movie/detail",
-      detailSe: playback.season ? String(playback.season) : "",
-      detailEp: playback.episode ? String(playback.episode) : "",
-      lang: "en",
+      type: '/movie/detail',
+      detailSe: playback.season ? String(playback.season) : '',
+      detailEp: playback.episode ? String(playback.episode) : '',
+      lang: 'en',
     });
-    const referer = absoluteUrl(
-      baseUrl,
-      `/movies/${playback.detailPath}?${watchParams}`,
-    );
+    const referer = absoluteUrl(baseUrl, `/movies/${playback.detailPath}?${watchParams}`);
     const playParams = new URLSearchParams({
       subjectId: playback.subjectId,
       detailPath: playback.detailPath,
     });
     if (playback.season && playback.episode) {
-      playParams.set("se", String(playback.season));
-      playParams.set("ep", String(playback.episode));
+      playParams.set('se', String(playback.season));
+      playParams.set('ep', String(playback.episode));
     }
 
-    const playUrl = absoluteUrl(
-      baseUrl,
-      `/wefeed-h5api-bff/subject/play?${playParams}`,
-    );
+    const playUrl = absoluteUrl(baseUrl, `/wefeed-h5api-bff/subject/play?${playParams}`);
     const response = await fetch(playUrl, {
       headers: { ...requestHeaders, Referer: referer },
     });
     if (!response.ok) {
-      throw new Error(
-        `HTTP ${response.status} ${response.statusText} | URL ${playUrl}`,
-      );
+      throw new Error(`HTTP ${response.status} ${response.statusText} | URL ${playUrl}`);
     }
 
     const data = await response.json();
     const playData = data?.data;
     if (data?.code !== 0) {
-      throw new Error(
-        data?.message || `MovieBox Web play API code ${data?.code}`,
-      );
+      throw new Error(data?.message || `MovieBox Web play API code ${data?.code}`);
     }
     if (playData?.hasResource === false) return [];
-    if (!playData) throw new Error("MovieBox Web play data was not found");
+    if (!playData) throw new Error('MovieBox Web play data was not found');
 
     const sources = [
       ...(playData.streams || []),
       ...(playData.hls || []),
       ...(playData.dash || []),
     ] as PlayStream[];
-    const availableSources = sources.filter(
-      (source) => source.url && !source.vipLocked,
-    );
+    const availableSources = sources.filter((source) => source.url && !source.vipLocked);
 
-    console.log("MovieBox Web stream sources", availableSources);
+    console.log('MovieBox Web stream sources', availableSources);
     return Promise.all(
       availableSources.map(async (source) => ({
-        server:
-          `${playback.language} ${source.resolutions || source.format || ""}`.trim(),
-        link: source.url || "",
+        server: `${playback.language} ${source.resolutions || source.format || ''}`.trim(),
+        link: source.url || '',
         type: getStreamType(source.format),
         quality: getQuality(source.resolutions),
         subtitles: await getCaptions(baseUrl, playback, source, referer),
@@ -159,6 +139,6 @@ export const getStream = async function ({
       })),
     );
   } catch (error) {
-    throwProviderError("MovieBox Web", "stream", error);
+    throwProviderError('MovieBox Web', 'stream', error);
   }
 };

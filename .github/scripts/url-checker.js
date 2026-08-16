@@ -1,23 +1,22 @@
-const fs = require("fs");
-const axios = require("axios");
+const fs = require('fs');
+const axios = require('axios');
 
-const filePath = process.env.URL_FILE_PATH || "urls.json";
+const filePath = process.env.URL_FILE_PATH || 'urls.json';
 const updatedProviders = [];
 
 const defaultHeaders = {
-  "User-Agent":
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
-  Accept:
-    "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-  "Accept-Language": "en-US,en;q=0.9",
-  "Accept-Encoding": "gzip, deflate, br",
-  Connection: "keep-alive",
-  "Upgrade-Insecure-Requests": "1",
+  'User-Agent':
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36',
+  Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+  'Accept-Language': 'en-US,en;q=0.9',
+  'Accept-Encoding': 'gzip, deflate, br',
+  Connection: 'keep-alive',
+  'Upgrade-Insecure-Requests': '1',
 };
 
 function readProviders() {
   try {
-    return JSON.parse(fs.readFileSync(filePath, "utf8"));
+    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
   } catch (error) {
     console.error(`Error reading ${filePath}:`, error);
     process.exit(1);
@@ -34,7 +33,7 @@ function getOrigin(url) {
 }
 
 function hasTrailingSlash(url) {
-  return url.endsWith("/") && !url.endsWith("://");
+  return url.endsWith('/') && !url.endsWith('://');
 }
 
 function getFinalUrl(response, originalUrl) {
@@ -54,12 +53,12 @@ function getUpdatedUrl(originalUrl, finalUrl) {
     return null;
   }
 
-  return finalOrigin + (hasTrailingSlash(originalUrl) ? "/" : "");
+  return finalOrigin + (hasTrailingSlash(originalUrl) ? '/' : '');
 }
 
 async function requestUrl(url) {
   return axios({
-    method: "get",
+    method: 'get',
     url,
     maxRedirects: 5,
     timeout: 10000,
@@ -91,9 +90,9 @@ async function checkUrl(url) {
       return updatedUrl;
     }
 
-    if (error.code === "ECONNABORTED") {
+    if (error.code === 'ECONNABORTED') {
       console.log(`${url} request timed out`);
-    } else if (error.code === "ENOTFOUND") {
+    } else if (error.code === 'ENOTFOUND') {
       console.log(`${url} domain not found`);
     } else {
       console.log(`Error checking ${url}: ${error.message}`);
@@ -132,16 +131,16 @@ async function main() {
 
   fs.writeFileSync(filePath, `${JSON.stringify(providers, null, 2)}\n`);
   console.log(`Updated ${filePath} with new URLs`);
-  console.log("### UPDATED_PROVIDERS_START ###");
+  console.log('### UPDATED_PROVIDERS_START ###');
 
   for (const provider of updatedProviders) {
     console.log(`${provider.name}|${provider.oldUrl}|${provider.newUrl}`);
   }
 
-  console.log("### UPDATED_PROVIDERS_END ###");
+  console.log('### UPDATED_PROVIDERS_END ###');
 }
 
 main().catch((error) => {
-  console.error("Unhandled error:", error);
+  console.error('Unhandled error:', error);
   process.exit(1);
 });
