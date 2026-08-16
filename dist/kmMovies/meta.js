@@ -1,1 +1,455 @@
-"use strict";var __defProp=Object.defineProperty,__defProps=Object.defineProperties,__getOwnPropDesc=Object.getOwnPropertyDescriptor,__getOwnPropDescs=Object.getOwnPropertyDescriptors,__getOwnPropNames=Object.getOwnPropertyNames,__getOwnPropSymbols=Object.getOwnPropertySymbols,__hasOwnProp=Object.prototype.hasOwnProperty,__propIsEnum=Object.prototype.propertyIsEnumerable,__defNormalProp=(obj,key,value)=>key in obj?__defProp(obj,key,{enumerable:!0,configurable:!0,writable:!0,value:value}):obj[key]=value,__spreadValues=(a,b)=>{for(var prop in b||(b={}))__hasOwnProp.call(b,prop)&&__defNormalProp(a,prop,b[prop]);if(__getOwnPropSymbols)for(var prop of __getOwnPropSymbols(b))__propIsEnum.call(b,prop)&&__defNormalProp(a,prop,b[prop]);return a},__spreadProps=(a,b)=>__defProps(a,__getOwnPropDescs(b)),__name=(target,value)=>__defProp(target,"name",{value:value,configurable:!0}),__export=(target,all)=>{for(var name in all)__defProp(target,name,{get:all[name],enumerable:!0})},__copyProps=(to,from,except,desc)=>{if(from&&"object"==typeof from||"function"==typeof from)for(let key of __getOwnPropNames(from))__hasOwnProp.call(to,key)||key===except||__defProp(to,key,{get:()=>from[key],enumerable:!(desc=__getOwnPropDesc(from,key))||desc.enumerable});return to},__toCommonJS=mod=>__copyProps(__defProp({},"__esModule",{value:!0}),mod),__async=(__this,__arguments,generator)=>new Promise((resolve,reject)=>{var fulfilled=value=>{try{step(generator.next(value))}catch(e){reject(e)}},rejected=value=>{try{step(generator.throw(value))}catch(e){reject(e)}},step=x=>x.done?resolve(x.value):Promise.resolve(x.value).then(fulfilled,rejected);step((generator=generator.apply(__this,__arguments)).next())}),meta_exports={};__export(meta_exports,{getMeta:()=>getMeta});var DEFAULT_URLS_ENDPOINT="https://raw.githubusercontent.com/harusharu/stream-providers/refs/heads/main/urls.json",cacheTtl=36e5;function getCache(){const state="undefined"!=typeof providerGlobal&&providerGlobal?providerGlobal:globalThis;return null!=state.__vegaProviderBaseUrlCache__||(state.__vegaProviderBaseUrlCache__={expiresAt:0}),state.__vegaProviderBaseUrlCache__}function urlsEndpoint(){const fromEnv="undefined"!=typeof process&&process.env?process.env.URLS_MANIFEST_URL:void 0;return fromEnv&&""!==fromEnv.trim()?fromEnv.trim():DEFAULT_URLS_ENDPOINT}function fetchProviderUrls(){return __async(this,null,function*(){const cache=getCache();if(cache.data&&Date.now()<cache.expiresAt)return cache.data;if(cache.request)return cache.request;const request=fetch(urlsEndpoint()).then(response=>__async(null,null,function*(){if(!response.ok)throw new Error(`URL configuration request failed: ${response.status}`);const data=yield response.json();return console.log("Fetched provider URL configuration"),cache.data=data,cache.expiresAt=Date.now()+cacheTtl,data})).catch(error=>{if(cache.data)return console.warn("Using stale provider URL configuration",error),cache.data;throw error}).finally(()=>{cache.request=void 0});return Object.defineProperty(cache,"request",{configurable:!0,enumerable:!1,value:request,writable:!0}),request})}__name(getCache,"getCache"),__name(urlsEndpoint,"urlsEndpoint"),__name(fetchProviderUrls,"fetchProviderUrls");var getBaseUrl=__name(providerValue=>__async(null,null,function*(){var _a,_b;try{return null!=(_b=null==(_a=(yield fetchProviderUrls())[providerValue])?void 0:_a.url)?_b:""}catch(error){throw console.error(`Error fetching baseUrl: ${providerValue}`,error),error}}),"getBaseUrl");function getErrorMessage(error){if(error instanceof Error)return error.message;if("string"==typeof error)return error;try{return JSON.stringify(error)}catch(e){return String(error)}}function throwProviderError(provider,operation,error){var _a,_b;const response=null==error?void 0:error.response,status=null==response?void 0:response.status,statusText=null==response?void 0:response.statusText,url=(null==(_a=null==response?void 0:response.config)?void 0:_a.url)||(null==(_b=null==error?void 0:error.config)?void 0:_b.url),details=[status?`HTTP ${status}${statusText?` ${statusText}`:""}`:"",url?`URL ${url}`:"",getErrorMessage(error)].filter(Boolean);throw new Error(`${provider} ${operation} failed: ${details.join(" | ")}`)}__name(getErrorMessage,"getErrorMessage"),__name(throwProviderError,"throwProviderError");var CINEMETA_BASE_URL="https://v3-cinemeta.strem.io/meta",CONTEXT_KEY="cinemetaMeta";function isCinemetaPromise(value){return"function"==typeof value.then}function getCache2(){const state="undefined"!=typeof providerGlobal&&providerGlobal?providerGlobal:globalThis;return state.__vegaCinemetaCache__&&"object"==typeof state.__vegaCinemetaCache__||(state.__vegaCinemetaCache__=Object.create(null)),state.__vegaCinemetaCache__}function getCinemetaMeta(imdbId,type,providerContext){if(!/^tt\d+$/.test(imdbId))return Promise.reject(new Error(`Invalid IMDb ID: ${imdbId}`));const cache=getCache2(),cached=cache[imdbId];if(cached){if(isCinemetaPromise(cached))return cached;if(cached.name&&cached.imdb_id===imdbId)return Promise.resolve(cached);delete cache[imdbId]}const url=`${CINEMETA_BASE_URL}/${"series"===type?"series":"movie"}/${imdbId}.json`,request=providerContext.axios.get(url).then(response=>{var _a;const meta=null==(_a=response.data)?void 0:_a.meta;if(!(null==meta?void 0:meta.name)||meta.imdb_id!==imdbId)throw new Error(`Cinemeta returned invalid metadata for ${imdbId}`);return cache[imdbId]=meta,meta}).catch(error=>{throw delete cache[imdbId],error});return cache[imdbId]=request,request}function applyCinemetaMeta(info,meta){var _a;return __spreadProps(__spreadValues({},info),{title:meta.name&&/[a-zA-Z]/.test(meta.name)?meta.name:info.title,image:meta.background||meta.poster||info.image,poster:meta.poster||info.poster,logo:meta.logo||void 0,synopsis:meta.description||info.synopsis,imdbId:"",tmdbId:(null==(_a=meta.moviedb_id)?void 0:_a.toString())||void 0,type:meta.type||info.type,tags:meta.genres||meta.genre||void 0,cast:meta.cast||void 0,rating:meta.imdbRating||void 0})}function getCinemetaSeason(value){if(/\bseason\s*:?\s*\d{1,2}\s*[-–&/]\s*(?:season\s*:?\s*)?\d{1,2}\b/i.test(value))return;const matches=[...value.matchAll(/\bseason\s*:?\s*(\d{1,2})\b/gi),...value.matchAll(/\bs(\d{1,2})(?=\s*e\d|\b)/gi)].map(match=>Number(match[1])),seasons=[...new Set(matches.filter(season=>season>0))];return 1===seasons.length?seasons[0]:void 0}function addCinemetaContext(url,imdbId,season){const parsedUrl=new URL(url);return parsedUrl.hash=`${CONTEXT_KEY}=${encodeURIComponent(JSON.stringify({imdbId:imdbId,season:season}))}`,parsedUrl.href}__name(isCinemetaPromise,"isCinemetaPromise"),__name(getCache2,"getCache"),__name(getCinemetaMeta,"getCinemetaMeta"),__name(applyCinemetaMeta,"applyCinemetaMeta"),__name(getCinemetaSeason,"getCinemetaSeason"),__name(addCinemetaContext,"addCinemetaContext");var kmmHeaders={"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0",Accept:"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8","Accept-Language":"en-US,en;q=0.9",Pragma:"no-cache","Cache-Control":"no-cache"};function getWithWAF(url,axios,openWebView,headers){return __async(this,null,function*(){var _a;const baseUrl=url.split("/").slice(0,3).join("/");try{return yield axios.get(url,{headers:__spreadProps(__spreadValues({},headers),{Referer:baseUrl})})}catch(error){if(403===(null==(_a=error.response)?void 0:_a.status)&&openWebView){console.log(`WAF detected (403) for ${url}, using solver...`);const wafResult=yield openWebView(baseUrl,{title:"Solve the captcha below and click done",description:"Required to bypass anti-bot protection.",headers:__spreadProps(__spreadValues({},headers),{Referer:baseUrl}),waitForCookie:"cf_clearance"});return yield axios.get(url,{headers:__spreadProps(__spreadValues({},headers),{Referer:baseUrl,Cookie:wafResult.cookies})})}throw error}})}function resolvePostUrl(link,baseUrl){const currentBaseUrl=new URL(baseUrl),postUrl=new URL(link,`${baseUrl}/`);return postUrl.hostname.includes("kmmovies")?new URL(`${postUrl.pathname}${postUrl.search}`,currentBaseUrl).href:postUrl.href}function getQuality(title){const match=title.match(/\b(480|720|1080|2160)p\b/i);return match?`${match[1]}p`:"AUTO"}function getVersionTitle(anchor,$){return $(anchor).hasClass("webdl")?"WebDL Version":$(anchor).hasClass("encoded")?"Encoded Version":""}function extractImdbId($,html){var _a,_b;return(null==(_a=($("a[href*='imdb.com/title/tt']").first().attr("href")||"").match(/tt\d+/i))?void 0:_a[0])||(null==(_b=html.match(/tt\d{7,}/i))?void 0:_b[0])||""}function extractLinkList($,pageUrl){const links=[],seen=new Set;return $(".type-content[data-type]").each((_,container)=>{const group=$(container).attr("data-type")||"";if(group.startsWith("zip-"))return;const isEpisodeGroup=group.startsWith("episodes-"),groupTitle=group.startsWith("combined-")?"Combined":"Episode Wise";$(container).find("a.dl-btn[href]").each((__,anchor)=>{var _a;const href=null==(_a=$(anchor).attr("href"))?void 0:_a.trim(),label=$(anchor).text().replace(/\s+/g," ").trim();if(!href||!label)return;const versionTitle=getVersionTitle(anchor,$),title=[versionTitle,groupTitle,label].filter(Boolean).join(" - "),resolvedUrl=new URL(href,pageUrl).href,key=`${versionTitle}:${group}:${resolvedUrl}`;if(seen.has(key))return;seen.add(key);const link={title:title,quality:getQuality(label)};isEpisodeGroup?link.episodesLink=resolvedUrl:link.directLinks=[{title:title,link:resolvedUrl,type:"series"}],links.push(link)})}),links.length>0||$("a.dl-btn[href]").each((_,anchor)=>{var _a;const group=$(anchor).closest(".type-content[data-type]").attr("data-type");if(null==group?void 0:group.startsWith("zip-"))return;const href=null==(_a=$(anchor).attr("href"))?void 0:_a.trim(),label=$(anchor).text().replace(/\s+/g," ").trim();if(!href||!label)return;const versionTitle=getVersionTitle(anchor,$),title=versionTitle?`${versionTitle} - ${label}`:`Download ${label}`,resolvedUrl=new URL(href,pageUrl).href,key=`${versionTitle}:${resolvedUrl}`;seen.has(key)||(seen.add(key),links.push({title:title,quality:getQuality(label),directLinks:[{title:title,link:resolvedUrl,type:"movie"}]}))}),links}__name(getWithWAF,"getWithWAF"),__name(resolvePostUrl,"resolvePostUrl"),__name(getQuality,"getQuality"),__name(getVersionTitle,"getVersionTitle"),__name(extractImdbId,"extractImdbId"),__name(extractLinkList,"extractLinkList");var getMeta=__name(function(_0){return __async(this,arguments,function*({link:link,providerContext:providerContext}){var _a,_b,_c,_d,_e;try{const{axios:axios,cheerio:cheerio,openWebView:openWebView}=providerContext,pageUrl=resolvePostUrl(link,yield getBaseUrl("kmmovies")),res=yield getWithWAF(pageUrl,axios,openWebView,kmmHeaders),html=String(res.data||""),$=cheerio.load(html),overview=$("#movie-overview"),title=overview.find(".hero-title").first().text().trim()||$("h1").first().text().trim()||(null==(_a=$("meta[property='og:title']").attr("content"))?void 0:_a.trim())||$("title").text().trim()||"Unknown",backdropStyle=overview.find(".hero-backdrop").first().attr("style"),imagePath=(null==(_b=null==backdropStyle?void 0:backdropStyle.match(/background-image:\s*url\(["']?([^"')]+)["']?\)/i))?void 0:_b[1])||overview.find("img.hero-poster").first().attr("src")||overview.find("img.hero-poster").first().attr("data-src")||$("meta[property='og:image']").attr("content")||$("meta[name='twitter:image']").attr("content")||"",image=imagePath?new URL(imagePath,pageUrl).href:"",synopsis=overview.find(".hero-description").first().text().replace(/\s+/g," ").trim()||(null==(_c=$("meta[property='og:description']").attr("content"))?void 0:_c.trim())||(null==(_d=$("meta[name='description']").attr("content"))?void 0:_d.trim())||"",ratingValue=null==(_e=overview.find(".meta-pill.rating-star").first().text().match(/[0-9]+(?:\.[0-9]+)?/))?void 0:_e[0],rating=ratingValue?`${ratingValue}/10`:"",imdbId=extractImdbId($,html),tags=[...new Set($("a[href*='/genre/']").map((_,element)=>{const href=$(element).attr("href")||"";return"/genre/"!==new URL(href,pageUrl).pathname?$(element).text().replace(/\s+/g," ").trim():""}).get().filter(Boolean))],cast=$("a[href*='/actor/']").map((_,element)=>$(element).text().replace(/\s+/g," ").trim()).get().filter(Boolean),linkList=extractLinkList($,pageUrl),type=$(".type-content[data-type^='episodes-']").length>0||/\bS\d{1,2}\b/i.test(title)?"series":"movie",websiteInfo={title:title,synopsis:synopsis,image:image,imdbId:"",type:type,tags:tags,cast:cast,rating:rating,linkList:linkList,webUrl:pageUrl};if(!imdbId)return websiteInfo;const cinemeta=yield getCinemetaMeta(imdbId,type,providerContext);return"series"===type&&"series"===cinemeta.type&&(websiteInfo.linkList=websiteInfo.linkList.map(item=>{if(!item.episodesLink)return item;const season=getCinemetaSeason(item.title)||getCinemetaSeason(title);return season?__spreadProps(__spreadValues({},item),{episodesLink:addCinemetaContext(item.episodesLink,imdbId,season)}):item})),applyCinemetaMeta(websiteInfo,cinemeta)}catch(err){throwProviderError("KMMovies","metadata",err)}})},"getMeta");exports.getMeta=getMeta;
+"use strict";
+var __defProp = Object.defineProperty;
+var __defProps = Object.defineProperties;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getOwnPropSymbols = Object.getOwnPropertySymbols;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __propIsEnum = Object.prototype.propertyIsEnumerable;
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __spreadValues = (a, b) => {
+  for (var prop in b || (b = {}))
+    if (__hasOwnProp.call(b, prop))
+      __defNormalProp(a, prop, b[prop]);
+  if (__getOwnPropSymbols)
+    for (var prop of __getOwnPropSymbols(b)) {
+      if (__propIsEnum.call(b, prop))
+        __defNormalProp(a, prop, b[prop]);
+    }
+  return a;
+};
+var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+var __async = (__this, __arguments, generator) => {
+  return new Promise((resolve, reject) => {
+    var fulfilled = (value) => {
+      try {
+        step(generator.next(value));
+      } catch (e) {
+        reject(e);
+      }
+    };
+    var rejected = (value) => {
+      try {
+        step(generator.throw(value));
+      } catch (e) {
+        reject(e);
+      }
+    };
+    var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
+    step((generator = generator.apply(__this, __arguments)).next());
+  });
+};
+
+// providers/kmMovies/meta.ts
+var meta_exports = {};
+__export(meta_exports, {
+  getMeta: () => getMeta
+});
+
+
+// providers/getBaseUrl.ts
+var import_fs = require("fs");
+var import_path = require("path");
+var cacheTtl = 60 * 60 * 1e3;
+function getCache() {
+  var _a;
+  const state = typeof providerGlobal !== "undefined" && providerGlobal ? providerGlobal : globalThis;
+  (_a = state.__vegaProviderBaseUrlCache__) != null ? _a : state.__vegaProviderBaseUrlCache__ = { expiresAt: 0 };
+  return state.__vegaProviderBaseUrlCache__;
+}
+__name(getCache, "getCache");
+function urlsEndpoint() {
+  const fromEnv = typeof process !== "undefined" && process.env ? process.env.URLS_MANIFEST_URL : void 0;
+  return fromEnv && fromEnv.trim() !== "" ? fromEnv.trim() : "";
+}
+__name(urlsEndpoint, "urlsEndpoint");
+function readLocalUrls() {
+  var _a;
+  const root = typeof process !== "undefined" && ((_a = process.env) == null ? void 0 : _a.PROVIDERS_ROOT) ? process.env.PROVIDERS_ROOT : process.cwd();
+  try {
+    return JSON.parse((0, import_fs.readFileSync)((0, import_path.join)(root, "urls.json"), "utf8"));
+  } catch (e) {
+    return {};
+  }
+}
+__name(readLocalUrls, "readLocalUrls");
+function fetchProviderUrls() {
+  return __async(this, null, function* () {
+    const cache = getCache();
+    if (cache.data && Date.now() < cache.expiresAt) {
+      return cache.data;
+    }
+    if (cache.request) {
+      return cache.request;
+    }
+    let request;
+    const endpoint = urlsEndpoint();
+    if (endpoint === "") {
+      request = Promise.resolve().then(() => {
+        cache.data = readLocalUrls();
+        cache.expiresAt = Date.now() + cacheTtl;
+        return cache.data;
+      });
+    } else {
+      request = fetch(endpoint).then((response) => __async(null, null, function* () {
+        if (!response.ok) {
+          throw new Error(`URL configuration request failed: ${response.status}`);
+        }
+        const data = yield response.json();
+        console.log("Fetched provider URL configuration");
+        cache.data = data;
+        cache.expiresAt = Date.now() + cacheTtl;
+        return data;
+      })).catch((error) => {
+        if (cache.data) {
+          console.warn("Using stale provider URL configuration", error);
+          return cache.data;
+        }
+        throw error;
+      });
+    }
+    request.finally(() => {
+      cache.request = void 0;
+    });
+    Object.defineProperty(cache, "request", {
+      configurable: true,
+      enumerable: false,
+      value: request,
+      writable: true
+    });
+    return request;
+  });
+}
+__name(fetchProviderUrls, "fetchProviderUrls");
+var getBaseUrl = /* @__PURE__ */ __name((providerValue) => __async(null, null, function* () {
+  var _a, _b;
+  try {
+    const providerUrls = yield fetchProviderUrls();
+    return (_b = (_a = providerUrls[providerValue]) == null ? void 0 : _a.url) != null ? _b : "";
+  } catch (error) {
+    console.error(`Error fetching baseUrl: ${providerValue}`, error);
+    throw error;
+  }
+}), "getBaseUrl");
+
+// providers/providerErrors.ts
+function getErrorMessage(error) {
+  if (error instanceof Error) return error.message;
+  if (typeof error === "string") return error;
+  try {
+    return JSON.stringify(error);
+  } catch (e) {
+    return String(error);
+  }
+}
+__name(getErrorMessage, "getErrorMessage");
+function throwProviderError(provider, operation, error) {
+  var _a, _b;
+  const response = error == null ? void 0 : error.response;
+  const status = response == null ? void 0 : response.status;
+  const statusText = response == null ? void 0 : response.statusText;
+  const url = ((_a = response == null ? void 0 : response.config) == null ? void 0 : _a.url) || ((_b = error == null ? void 0 : error.config) == null ? void 0 : _b.url);
+  const details = [
+    status ? `HTTP ${status}${statusText ? ` ${statusText}` : ""}` : "",
+    url ? `URL ${url}` : "",
+    getErrorMessage(error)
+  ].filter(Boolean);
+  throw new Error(`${provider} ${operation} failed: ${details.join(" | ")}`);
+}
+__name(throwProviderError, "throwProviderError");
+
+// providers/getCinemetaMeta.ts
+var CINEMETA_BASE_URL = "https://v3-cinemeta.strem.io/meta";
+var CONTEXT_KEY = "cinemetaMeta";
+function isCinemetaPromise(value) {
+  return typeof value.then === "function";
+}
+__name(isCinemetaPromise, "isCinemetaPromise");
+function getCache2() {
+  const state = typeof providerGlobal !== "undefined" && providerGlobal ? providerGlobal : globalThis;
+  if (!state.__vegaCinemetaCache__ || typeof state.__vegaCinemetaCache__ !== "object") {
+    state.__vegaCinemetaCache__ = /* @__PURE__ */ Object.create(null);
+  }
+  return state.__vegaCinemetaCache__;
+}
+__name(getCache2, "getCache");
+function getCinemetaMeta(imdbId, type, providerContext) {
+  if (!/^tt\d+$/.test(imdbId)) {
+    return Promise.reject(new Error(`Invalid IMDb ID: ${imdbId}`));
+  }
+  const cache = getCache2();
+  const cached = cache[imdbId];
+  if (cached) {
+    if (isCinemetaPromise(cached)) {
+      return cached;
+    }
+    if (cached.name && cached.imdb_id === imdbId) {
+      return Promise.resolve(cached);
+    }
+    delete cache[imdbId];
+  }
+  const mediaType = type === "series" ? "series" : "movie";
+  const url = `${CINEMETA_BASE_URL}/${mediaType}/${imdbId}.json`;
+  const request = providerContext.axios.get(url).then((response) => {
+    var _a;
+    const meta = (_a = response.data) == null ? void 0 : _a.meta;
+    if (!(meta == null ? void 0 : meta.name) || meta.imdb_id !== imdbId) {
+      throw new Error(`Cinemeta returned invalid metadata for ${imdbId}`);
+    }
+    cache[imdbId] = meta;
+    return meta;
+  }).catch((error) => {
+    delete cache[imdbId];
+    throw error;
+  });
+  cache[imdbId] = request;
+  return request;
+}
+__name(getCinemetaMeta, "getCinemetaMeta");
+function applyCinemetaMeta(info, meta) {
+  var _a;
+  return __spreadProps(__spreadValues({}, info), {
+    // Cinemeta sometimes returns a non-title name (e.g. a numeric record id);
+    // don't let it clobber a correctly-scraped title.
+    title: meta.name && /[a-zA-Z]/.test(meta.name) ? meta.name : info.title,
+    image: meta.background || meta.poster || info.image,
+    poster: meta.poster || info.poster,
+    logo: meta.logo || void 0,
+    synopsis: meta.description || info.synopsis,
+    imdbId: "",
+    tmdbId: ((_a = meta.moviedb_id) == null ? void 0 : _a.toString()) || void 0,
+    type: meta.type || info.type,
+    tags: meta.genres || meta.genre || void 0,
+    cast: meta.cast || void 0,
+    rating: meta.imdbRating || void 0
+  });
+}
+__name(applyCinemetaMeta, "applyCinemetaMeta");
+function getCinemetaSeason(value) {
+  if (/\bseason\s*:?\s*\d{1,2}\s*[-–&/]\s*(?:season\s*:?\s*)?\d{1,2}\b/i.test(value)) {
+    return void 0;
+  }
+  const matches = [
+    ...value.matchAll(/\bseason\s*:?\s*(\d{1,2})\b/gi),
+    ...value.matchAll(/\bs(\d{1,2})(?=\s*e\d|\b)/gi)
+  ].map((match) => Number(match[1]));
+  const seasons = [...new Set(matches.filter((season) => season > 0))];
+  return seasons.length === 1 ? seasons[0] : void 0;
+}
+__name(getCinemetaSeason, "getCinemetaSeason");
+function addCinemetaContext(url, imdbId, season) {
+  const parsedUrl = new URL(url);
+  parsedUrl.hash = `${CONTEXT_KEY}=${encodeURIComponent(JSON.stringify({ imdbId, season }))}`;
+  return parsedUrl.href;
+}
+__name(addCinemetaContext, "addCinemetaContext");
+
+// providers/kmMovies/meta.ts
+var kmmHeaders = {
+  "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0",
+  Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+  "Accept-Language": "en-US,en;q=0.9",
+  Pragma: "no-cache",
+  "Cache-Control": "no-cache"
+};
+function getWithWAF(url, axios, openWebView, headers) {
+  return __async(this, null, function* () {
+    var _a;
+    const baseUrl = url.split("/").slice(0, 3).join("/");
+    try {
+      return yield axios.get(url, { headers: __spreadProps(__spreadValues({}, headers), { Referer: baseUrl }) });
+    } catch (error) {
+      if (((_a = error.response) == null ? void 0 : _a.status) === 403 && openWebView) {
+        console.log(`WAF detected (403) for ${url}, using solver...`);
+        const wafResult = yield openWebView(baseUrl, {
+          title: "Solve the captcha below and click done",
+          description: "Required to bypass anti-bot protection.",
+          headers: __spreadProps(__spreadValues({}, headers), { Referer: baseUrl }),
+          waitForCookie: "cf_clearance"
+        });
+        return yield axios.get(url, {
+          headers: __spreadProps(__spreadValues({}, headers), { Referer: baseUrl, Cookie: wafResult.cookies })
+        });
+      }
+      throw error;
+    }
+  });
+}
+__name(getWithWAF, "getWithWAF");
+function resolvePostUrl(link, baseUrl) {
+  const currentBaseUrl = new URL(baseUrl);
+  const postUrl = new URL(link, `${baseUrl}/`);
+  if (postUrl.hostname.includes("kmmovies")) {
+    return new URL(`${postUrl.pathname}${postUrl.search}`, currentBaseUrl).href;
+  }
+  return postUrl.href;
+}
+__name(resolvePostUrl, "resolvePostUrl");
+function getQuality(title) {
+  const match = title.match(/\b(480|720|1080|2160)p\b/i);
+  return match ? `${match[1]}p` : "AUTO";
+}
+__name(getQuality, "getQuality");
+function getVersionTitle(anchor, $) {
+  if ($(anchor).hasClass("webdl")) return "WebDL Version";
+  if ($(anchor).hasClass("encoded")) return "Encoded Version";
+  return "";
+}
+__name(getVersionTitle, "getVersionTitle");
+function extractImdbId($, html) {
+  var _a, _b;
+  const imdbUrl = $("a[href*='imdb.com/title/tt']").first().attr("href") || "";
+  return ((_a = imdbUrl.match(/tt\d+/i)) == null ? void 0 : _a[0]) || ((_b = html.match(/tt\d{7,}/i)) == null ? void 0 : _b[0]) || "";
+}
+__name(extractImdbId, "extractImdbId");
+function extractLinkList($, pageUrl) {
+  const links = [];
+  const seen = /* @__PURE__ */ new Set();
+  $(".type-content[data-type]").each((_, container) => {
+    const group = $(container).attr("data-type") || "";
+    if (group.startsWith("zip-")) return;
+    const isEpisodeGroup = group.startsWith("episodes-");
+    const groupTitle = group.startsWith("combined-") ? "Combined" : "Episode Wise";
+    $(container).find("a.dl-btn[href]").each((__, anchor) => {
+      var _a;
+      const href = (_a = $(anchor).attr("href")) == null ? void 0 : _a.trim();
+      const label = $(anchor).text().replace(/\s+/g, " ").trim();
+      if (!href || !label) return;
+      const versionTitle = getVersionTitle(anchor, $);
+      const title = [versionTitle, groupTitle, label].filter(Boolean).join(" - ");
+      const resolvedUrl = new URL(href, pageUrl).href;
+      const key = `${versionTitle}:${group}:${resolvedUrl}`;
+      if (seen.has(key)) return;
+      seen.add(key);
+      const link = {
+        title,
+        quality: getQuality(label)
+      };
+      if (isEpisodeGroup) {
+        link.episodesLink = resolvedUrl;
+      } else {
+        link.directLinks = [
+          {
+            title,
+            link: resolvedUrl,
+            type: "series"
+          }
+        ];
+      }
+      links.push(link);
+    });
+  });
+  if (links.length > 0) return links;
+  $("a.dl-btn[href]").each((_, anchor) => {
+    var _a;
+    const group = $(anchor).closest(".type-content[data-type]").attr("data-type");
+    if (group == null ? void 0 : group.startsWith("zip-")) return;
+    const href = (_a = $(anchor).attr("href")) == null ? void 0 : _a.trim();
+    const label = $(anchor).text().replace(/\s+/g, " ").trim();
+    if (!href || !label) return;
+    const versionTitle = getVersionTitle(anchor, $);
+    const title = versionTitle ? `${versionTitle} - ${label}` : `Download ${label}`;
+    const resolvedUrl = new URL(href, pageUrl).href;
+    const key = `${versionTitle}:${resolvedUrl}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    links.push({
+      title,
+      quality: getQuality(label),
+      directLinks: [
+        {
+          title,
+          link: resolvedUrl,
+          type: "movie"
+        }
+      ]
+    });
+  });
+  return links;
+}
+__name(extractLinkList, "extractLinkList");
+var getMeta = /* @__PURE__ */ __name(function(_0) {
+  return __async(this, arguments, function* ({
+    link,
+    providerContext
+  }) {
+    var _a, _b, _c, _d, _e;
+    try {
+      const { axios, cheerio, openWebView } = providerContext;
+      const baseUrl = yield getBaseUrl("kmmovies");
+      const pageUrl = resolvePostUrl(link, baseUrl);
+      const res = yield getWithWAF(pageUrl, axios, openWebView, kmmHeaders);
+      const html = String(res.data || "");
+      const $ = cheerio.load(html);
+      const overview = $("#movie-overview");
+      const title = overview.find(".hero-title").first().text().trim() || $("h1").first().text().trim() || ((_a = $("meta[property='og:title']").attr("content")) == null ? void 0 : _a.trim()) || $("title").text().trim() || "Unknown";
+      const backdropStyle = overview.find(".hero-backdrop").first().attr("style");
+      const backdropPath = (_b = backdropStyle == null ? void 0 : backdropStyle.match(
+        /background-image:\s*url\(["']?([^"')]+)["']?\)/i
+      )) == null ? void 0 : _b[1];
+      const imagePath = backdropPath || overview.find("img.hero-poster").first().attr("src") || overview.find("img.hero-poster").first().attr("data-src") || $("meta[property='og:image']").attr("content") || $("meta[name='twitter:image']").attr("content") || "";
+      const image = imagePath ? new URL(imagePath, pageUrl).href : "";
+      const synopsis = overview.find(".hero-description").first().text().replace(/\s+/g, " ").trim() || ((_c = $("meta[property='og:description']").attr("content")) == null ? void 0 : _c.trim()) || ((_d = $("meta[name='description']").attr("content")) == null ? void 0 : _d.trim()) || "";
+      const ratingValue = (_e = overview.find(".meta-pill.rating-star").first().text().match(/[0-9]+(?:\.[0-9]+)?/)) == null ? void 0 : _e[0];
+      const rating = ratingValue ? `${ratingValue}/10` : "";
+      const imdbId = extractImdbId($, html);
+      const tags = [
+        ...new Set(
+          $("a[href*='/genre/']").map((_, element) => {
+            const href = $(element).attr("href") || "";
+            const path = new URL(href, pageUrl).pathname;
+            return path !== "/genre/" ? $(element).text().replace(/\s+/g, " ").trim() : "";
+          }).get().filter(Boolean)
+        )
+      ];
+      const cast = $("a[href*='/actor/']").map((_, element) => $(element).text().replace(/\s+/g, " ").trim()).get().filter(Boolean);
+      const linkList = extractLinkList($, pageUrl);
+      const type = $(".type-content[data-type^='episodes-']").length > 0 || /\bS\d{1,2}\b/i.test(title) ? "series" : "movie";
+      const websiteInfo = {
+        title,
+        synopsis,
+        image,
+        imdbId: "",
+        type,
+        tags,
+        cast,
+        rating,
+        linkList,
+        webUrl: pageUrl
+      };
+      if (!imdbId) return websiteInfo;
+      const cinemeta = yield getCinemetaMeta(imdbId, type, providerContext);
+      if (type === "series" && cinemeta.type === "series") {
+        websiteInfo.linkList = websiteInfo.linkList.map((item) => {
+          if (!item.episodesLink) return item;
+          const season = getCinemetaSeason(item.title) || getCinemetaSeason(title);
+          if (!season) return item;
+          return __spreadProps(__spreadValues({}, item), {
+            episodesLink: addCinemetaContext(item.episodesLink, imdbId, season)
+          });
+        });
+      }
+      return applyCinemetaMeta(websiteInfo, cinemeta);
+    } catch (err) {
+      throwProviderError("KMMovies", "metadata", err);
+    }
+  });
+}, "getMeta");
+exports.getMeta = getMeta;
+// Annotate the CommonJS export names for ESM import in node:
+

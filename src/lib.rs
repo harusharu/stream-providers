@@ -134,11 +134,11 @@
 //! - `cheerio` — the real `cheerio` for HTML scraping.
 //! - `commonHeaders`, `Aes`, `AbortSignal`, `providerValue` — thin shims.
 //! - `global.fetch` — passes every request through to the real network.
-//!   `getBaseUrl()` reads its manifest endpoint from `URLS_MANIFEST_URL`
-//!   (set in `.env`, the single source of truth). When that variable is set,
-//!   a failed manifest fetch is served from the locally-deployed `urls.json`
-//!   (identical data) instead; when unset, the bundles fetch the `urls.json`
-//!   committed to this repo directly from GitHub raw.
+//!   `getBaseUrl()` reads `urls.json` from the local project directory
+//!   (`cwd`, i.e. `PROVIDERS_ROOT`) by default — the file is kept fresh by
+//!   the `check-urls` GitHub Action. When the optional `URLS_MANIFEST_URL`
+//!   is set (see `.env.example`), the manifest endpoint is fetched over the
+//!   network instead, falling back to the local copy on failure.
 //!
 //! Workers must run with `cwd = PROVIDERS_ROOT` so `axios`, `cheerio`, and
 //! `curl-cffi-node` resolve from the repo's `node_modules`.
