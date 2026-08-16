@@ -80,9 +80,9 @@ async fn search_all_fans_out_to_every_provider_and_tags_items() {
     let (status, body) = get_json(&app, "/api/search-all?query=inception&page=1").await;
     assert_eq!(status, StatusCode::OK);
     assert_eq!(mock.calls(), 2, "one gateway call per enabled provider");
-    assert_eq!(body["providers"], 2);
-    assert_eq!(body["failed"], 0);
-    let items = body["data"].as_array().unwrap();
+    assert_eq!(body["data"]["providers"], 2);
+    assert_eq!(body["data"]["failed"], 0);
+    let items = body["data"]["data"].as_array().unwrap();
     assert_eq!(items.len(), 4, "2 mock results × 2 providers");
     let vega: Vec<_> = items.iter().filter(|i| i["provider"] == "vega").collect();
     let showbox: Vec<_> = items
@@ -103,9 +103,9 @@ async fn search_all_provider_subset() {
     let (status, body) = get_json(&app, "/api/search-all?query=inception&providers=showbox").await;
     assert_eq!(status, StatusCode::OK);
     assert_eq!(mock.calls(), 1, "only the requested provider is queried");
-    assert_eq!(body["providers"], 1);
-    assert_eq!(body["failed"], 0);
-    let items = body["data"].as_array().unwrap();
+    assert_eq!(body["data"]["providers"], 1);
+    assert_eq!(body["data"]["failed"], 0);
+    let items = body["data"]["data"].as_array().unwrap();
     assert_eq!(items.len(), 2);
     assert!(items.iter().all(|i| i["provider"] == "showbox"));
 }
@@ -117,9 +117,9 @@ async fn search_all_tolerates_failing_providers() {
     let app = app!(mock.clone(), test_config()).await;
     let (status, body) = get_json(&app, "/api/search-all?query=inception").await;
     assert_eq!(status, StatusCode::OK, "partial failures are tolerated");
-    assert_eq!(body["failed"], 1);
-    assert_eq!(body["providers"], 2);
-    let items = body["data"].as_array().unwrap();
+    assert_eq!(body["data"]["failed"], 1);
+    assert_eq!(body["data"]["providers"], 2);
+    let items = body["data"]["data"].as_array().unwrap();
     assert_eq!(items.len(), 2, "only the healthy provider's results");
     assert!(items.iter().all(|i| i["provider"] == "vega"));
 }
