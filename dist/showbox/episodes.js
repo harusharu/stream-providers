@@ -1,1 +1,118 @@
-"use strict";var __defProp=Object.defineProperty,__getOwnPropDesc=Object.getOwnPropertyDescriptor,__getOwnPropNames=Object.getOwnPropertyNames,__hasOwnProp=Object.prototype.hasOwnProperty,__name=(target,value)=>__defProp(target,"name",{value:value,configurable:!0}),__export=(target,all)=>{for(var name in all)__defProp(target,name,{get:all[name],enumerable:!0})},__copyProps=(to,from,except,desc)=>{if(from&&"object"==typeof from||"function"==typeof from)for(let key of __getOwnPropNames(from))__hasOwnProp.call(to,key)||key===except||__defProp(to,key,{get:()=>from[key],enumerable:!(desc=__getOwnPropDesc(from,key))||desc.enumerable});return to},__toCommonJS=mod=>__copyProps(__defProp({},"__esModule",{value:!0}),mod),__async=(__this,__arguments,generator)=>new Promise((resolve,reject)=>{var fulfilled=value=>{try{step(generator.next(value))}catch(e){reject(e)}},rejected=value=>{try{step(generator.throw(value))}catch(e){reject(e)}},step=x=>x.done?resolve(x.value):Promise.resolve(x.value).then(fulfilled,rejected);step((generator=generator.apply(__this,__arguments)).next())}),episodes_exports={};function getErrorMessage(error){if(error instanceof Error)return error.message;if("string"==typeof error)return error;try{return JSON.stringify(error)}catch(e){return String(error)}}function throwProviderError(provider,operation,error){var _a,_b;const response=null==error?void 0:error.response,status=null==response?void 0:response.status,statusText=null==response?void 0:response.statusText,url=(null==(_a=null==response?void 0:response.config)?void 0:_a.url)||(null==(_b=null==error?void 0:error.config)?void 0:_b.url),details=[status?`HTTP ${status}${statusText?` ${statusText}`:""}`:"",url?`URL ${url}`:"",getErrorMessage(error)].filter(Boolean);throw new Error(`${provider} ${operation} failed: ${details.join(" | ")}`)}__export(episodes_exports,{getEpisodes:()=>getEpisodes}),__name(getErrorMessage,"getErrorMessage"),__name(throwProviderError,"throwProviderError");var getEpisodes=__name(function(_0){return __async(this,arguments,function*({url:id,providerContext:providerContext}){const{axios:axios}=providerContext;try{const[fileId,febboxId]=id.split("&"),febLink=febboxId?`https://www.febbox.com/file/file_share_list?share_key=${fileId}&pwd=&parent_id=${febboxId}&is_html=0`:`https://www.febbox.com/file/file_share_list?share_key=${fileId}&pwd=&is_html=0`,fileList=(yield axios.get(febLink)).data.data.file_list,episodeLinks=[];return null==fileList||fileList.map(file=>{const fileName=formatEpisodeName(file.file_name),epId=null==file?void 0:file.fid;!file.is_dir&&fileName&&epId&&episodeLinks.push({title:fileName,link:`${fileId}&${epId}`})}),episodeLinks}catch(err){throwProviderError("ShowBox","episodes",err)}})},"getEpisodes");function formatEpisodeName(title){const match=title.match(/[sS](\d+)\s*[eE](\d+)/);return match?`Season${match[1].padStart(2,"0")} Episode${match[2].padStart(2,"0")}`:title}__name(formatEpisodeName,"formatEpisodeName"),exports.getEpisodes=getEpisodes;
+"use strict";
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+var __async = (__this, __arguments, generator) => {
+  return new Promise((resolve, reject) => {
+    var fulfilled = (value) => {
+      try {
+        step(generator.next(value));
+      } catch (e) {
+        reject(e);
+      }
+    };
+    var rejected = (value) => {
+      try {
+        step(generator.throw(value));
+      } catch (e) {
+        reject(e);
+      }
+    };
+    var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
+    step((generator = generator.apply(__this, __arguments)).next());
+  });
+};
+
+// providers/showbox/episodes.ts
+var episodes_exports = {};
+__export(episodes_exports, {
+  getEpisodes: () => getEpisodes
+});
+
+
+// providers/providerErrors.ts
+function getErrorMessage(error) {
+  if (error instanceof Error) return error.message;
+  if (typeof error === "string") return error;
+  try {
+    return JSON.stringify(error);
+  } catch (e) {
+    return String(error);
+  }
+}
+__name(getErrorMessage, "getErrorMessage");
+function throwProviderError(provider, operation, error) {
+  var _a, _b;
+  const response = error == null ? void 0 : error.response;
+  const status = response == null ? void 0 : response.status;
+  const statusText = response == null ? void 0 : response.statusText;
+  const url = ((_a = response == null ? void 0 : response.config) == null ? void 0 : _a.url) || ((_b = error == null ? void 0 : error.config) == null ? void 0 : _b.url);
+  const details = [
+    status ? `HTTP ${status}${statusText ? ` ${statusText}` : ""}` : "",
+    url ? `URL ${url}` : "",
+    getErrorMessage(error)
+  ].filter(Boolean);
+  throw new Error(`${provider} ${operation} failed: ${details.join(" | ")}`);
+}
+__name(throwProviderError, "throwProviderError");
+
+// providers/showbox/episodes.ts
+var getEpisodes = /* @__PURE__ */ __name(function(_0) {
+  return __async(this, arguments, function* ({
+    url: id,
+    providerContext
+  }) {
+    const { axios } = providerContext;
+    try {
+      const [fileId, febboxId] = id.split("&");
+      const febLink = febboxId ? `https://www.febbox.com/file/file_share_list?share_key=${fileId}&pwd=&parent_id=${febboxId}&is_html=0` : `https://www.febbox.com/file/file_share_list?share_key=${fileId}&pwd=&is_html=0`;
+      const res = yield axios.get(febLink);
+      const data = res.data;
+      const fileList = data.data.file_list;
+      const episodeLinks = [];
+      fileList == null ? void 0 : fileList.map((file) => {
+        const fileName = formatEpisodeName(file.file_name);
+        const epId = file == null ? void 0 : file.fid;
+        if (!file.is_dir && fileName && epId) {
+          episodeLinks.push({
+            title: fileName,
+            link: `${fileId}&${epId}`
+          });
+        }
+      });
+      return episodeLinks;
+    } catch (err) {
+      throwProviderError("ShowBox", "episodes", err);
+    }
+  });
+}, "getEpisodes");
+function formatEpisodeName(title) {
+  const regex = /[sS](\d+)\s*[eE](\d+)/;
+  const match = title.match(regex);
+  if (match) {
+    const season = match[1].padStart(2, "0");
+    const episode = match[2].padStart(2, "0");
+    return `Season${season} Episode${episode}`;
+  } else {
+    return title;
+  }
+}
+__name(formatEpisodeName, "formatEpisodeName");
+exports.getEpisodes = getEpisodes;
+// Annotate the CommonJS export names for ESM import in node:
+

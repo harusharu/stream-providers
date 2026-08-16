@@ -12,10 +12,10 @@
 // worker degrades gracefully to axios/fetch's native transports — the API
 // still works, it just won't impersonate Chrome.
 //
-// `getBaseUrl()` reads the manifest endpoint from `URLS_MANIFEST_URL` (see
-// .env.example). When that variable is set we intercept the exact URL and
-// fall back to the locally-deployed `urls.json` (identical data) on failure;
-// when unset, the fetch goes straight to the network.
+// `getBaseUrl()` reads `urls.json` from the local project directory by
+// default (kept fresh by the check-urls GitHub Action). When the optional
+// `URLS_MANIFEST_URL` is set (see .env.example) we intercept that exact URL
+// and fall back to the locally-deployed copy on failure.
 
 const axios = require('axios');
 const cheerio = require('cheerio');

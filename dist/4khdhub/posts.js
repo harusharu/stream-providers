@@ -1,1 +1,228 @@
-"use strict";var __defProp=Object.defineProperty,__getOwnPropDesc=Object.getOwnPropertyDescriptor,__getOwnPropNames=Object.getOwnPropertyNames,__hasOwnProp=Object.prototype.hasOwnProperty,__name=(target,value)=>__defProp(target,"name",{value:value,configurable:!0}),__export=(target,all)=>{for(var name in all)__defProp(target,name,{get:all[name],enumerable:!0})},__copyProps=(to,from,except,desc)=>{if(from&&"object"==typeof from||"function"==typeof from)for(let key of __getOwnPropNames(from))__hasOwnProp.call(to,key)||key===except||__defProp(to,key,{get:()=>from[key],enumerable:!(desc=__getOwnPropDesc(from,key))||desc.enumerable});return to},__toCommonJS=mod=>__copyProps(__defProp({},"__esModule",{value:!0}),mod),__async=(__this,__arguments,generator)=>new Promise((resolve,reject)=>{var fulfilled=value=>{try{step(generator.next(value))}catch(e){reject(e)}},rejected=value=>{try{step(generator.throw(value))}catch(e){reject(e)}},step=x=>x.done?resolve(x.value):Promise.resolve(x.value).then(fulfilled,rejected);step((generator=generator.apply(__this,__arguments)).next())}),posts_exports={};__export(posts_exports,{getPosts:()=>getPosts,getSearchPosts:()=>getSearchPosts});var DEFAULT_URLS_ENDPOINT="https://raw.githubusercontent.com/harusharu/stream-providers/refs/heads/main/urls.json",cacheTtl=36e5;function getCache(){const state="undefined"!=typeof providerGlobal&&providerGlobal?providerGlobal:globalThis;return null!=state.__vegaProviderBaseUrlCache__||(state.__vegaProviderBaseUrlCache__={expiresAt:0}),state.__vegaProviderBaseUrlCache__}function urlsEndpoint(){const fromEnv="undefined"!=typeof process&&process.env?process.env.URLS_MANIFEST_URL:void 0;return fromEnv&&""!==fromEnv.trim()?fromEnv.trim():DEFAULT_URLS_ENDPOINT}function fetchProviderUrls(){return __async(this,null,function*(){const cache=getCache();if(cache.data&&Date.now()<cache.expiresAt)return cache.data;if(cache.request)return cache.request;const request=fetch(urlsEndpoint()).then(response=>__async(null,null,function*(){if(!response.ok)throw new Error(`URL configuration request failed: ${response.status}`);const data=yield response.json();return console.log("Fetched provider URL configuration"),cache.data=data,cache.expiresAt=Date.now()+cacheTtl,data})).catch(error=>{if(cache.data)return console.warn("Using stale provider URL configuration",error),cache.data;throw error}).finally(()=>{cache.request=void 0});return Object.defineProperty(cache,"request",{configurable:!0,enumerable:!1,value:request,writable:!0}),request})}__name(getCache,"getCache"),__name(urlsEndpoint,"urlsEndpoint"),__name(fetchProviderUrls,"fetchProviderUrls");var getBaseUrl=__name(providerValue=>__async(null,null,function*(){var _a,_b;try{return null!=(_b=null==(_a=(yield fetchProviderUrls())[providerValue])?void 0:_a.url)?_b:""}catch(error){throw console.error(`Error fetching baseUrl: ${providerValue}`,error),error}}),"getBaseUrl");function getErrorMessage(error){if(error instanceof Error)return error.message;if("string"==typeof error)return error;try{return JSON.stringify(error)}catch(e){return String(error)}}function throwProviderError(provider,operation,error){var _a,_b;const response=null==error?void 0:error.response,status=null==response?void 0:response.status,statusText=null==response?void 0:response.statusText,url=(null==(_a=null==response?void 0:response.config)?void 0:_a.url)||(null==(_b=null==error?void 0:error.config)?void 0:_b.url),details=[status?`HTTP ${status}${statusText?` ${statusText}`:""}`:"",url?`URL ${url}`:"",getErrorMessage(error)].filter(Boolean);throw new Error(`${provider} ${operation} failed: ${details.join(" | ")}`)}__name(getErrorMessage,"getErrorMessage"),__name(throwProviderError,"throwProviderError");var getPosts=__name(function(_0){return __async(this,arguments,function*({filter:filter,page:page,signal:signal,providerContext:providerContext}){const{cheerio:cheerio}=providerContext,baseUrl=yield getBaseUrl("4khdhub"),url=`${baseUrl+filter}/page/${page}`;return console.log("4khdhubGetPosts url",url),posts({baseUrl:baseUrl,url:url,signal:signal,cheerio:cheerio,operation:"posts"})})},"getPosts"),getSearchPosts=__name(function(_0){return __async(this,arguments,function*({searchQuery:searchQuery,page:page,signal:signal,providerContext:providerContext}){const{cheerio:cheerio}=providerContext,baseUrl=yield getBaseUrl("4khdhub"),url=1==page?`${baseUrl}/?s=${searchQuery}`:`${baseUrl}/page/${page}?s=${searchQuery}`;return console.log("4khdhubGetSearchPosts url",url),posts({baseUrl:baseUrl,url:url,signal:signal,cheerio:cheerio,operation:"search posts"})})},"getSearchPosts");function posts(_0){return __async(this,arguments,function*({baseUrl:baseUrl,url:url,signal:signal,cheerio:cheerio,operation:operation}){try{const res=yield fetch(url,{signal:signal});if(!res.ok)throw new Error(`HTTP ${res.status} ${res.statusText} | URL ${url}`);const data=yield res.text(),$=cheerio.load(data),catalog=[];return $(".card-grid").children().map((i,element)=>{const title=$(element).find(".movie-card-title").text(),link=$(element).attr("href"),image=$(element).find("img").attr("src");if(title&&link&&image){const postUrl=new URL(link,`${baseUrl}/`);catalog.push({title:title,link:`${postUrl.pathname}${postUrl.search}${postUrl.hash}`,image:image})}}),catalog}catch(err){throwProviderError("4KHDHub",operation,err)}})}__name(posts,"posts"),exports.getPosts=getPosts,exports.getSearchPosts=getSearchPosts;
+"use strict";
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+var __async = (__this, __arguments, generator) => {
+  return new Promise((resolve, reject) => {
+    var fulfilled = (value) => {
+      try {
+        step(generator.next(value));
+      } catch (e) {
+        reject(e);
+      }
+    };
+    var rejected = (value) => {
+      try {
+        step(generator.throw(value));
+      } catch (e) {
+        reject(e);
+      }
+    };
+    var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
+    step((generator = generator.apply(__this, __arguments)).next());
+  });
+};
+
+// providers/4khdhub/posts.ts
+var posts_exports = {};
+__export(posts_exports, {
+  getPosts: () => getPosts,
+  getSearchPosts: () => getSearchPosts
+});
+
+
+// providers/getBaseUrl.ts
+var import_fs = require("fs");
+var import_path = require("path");
+var cacheTtl = 60 * 60 * 1e3;
+function getCache() {
+  var _a;
+  const state = typeof providerGlobal !== "undefined" && providerGlobal ? providerGlobal : globalThis;
+  (_a = state.__vegaProviderBaseUrlCache__) != null ? _a : state.__vegaProviderBaseUrlCache__ = { expiresAt: 0 };
+  return state.__vegaProviderBaseUrlCache__;
+}
+__name(getCache, "getCache");
+function urlsEndpoint() {
+  const fromEnv = typeof process !== "undefined" && process.env ? process.env.URLS_MANIFEST_URL : void 0;
+  return fromEnv && fromEnv.trim() !== "" ? fromEnv.trim() : "";
+}
+__name(urlsEndpoint, "urlsEndpoint");
+function readLocalUrls() {
+  var _a;
+  const root = typeof process !== "undefined" && ((_a = process.env) == null ? void 0 : _a.PROVIDERS_ROOT) ? process.env.PROVIDERS_ROOT : process.cwd();
+  try {
+    return JSON.parse((0, import_fs.readFileSync)((0, import_path.join)(root, "urls.json"), "utf8"));
+  } catch (e) {
+    return {};
+  }
+}
+__name(readLocalUrls, "readLocalUrls");
+function fetchProviderUrls() {
+  return __async(this, null, function* () {
+    const cache = getCache();
+    if (cache.data && Date.now() < cache.expiresAt) {
+      return cache.data;
+    }
+    if (cache.request) {
+      return cache.request;
+    }
+    let request;
+    const endpoint = urlsEndpoint();
+    if (endpoint === "") {
+      request = Promise.resolve().then(() => {
+        cache.data = readLocalUrls();
+        cache.expiresAt = Date.now() + cacheTtl;
+        return cache.data;
+      });
+    } else {
+      request = fetch(endpoint).then((response) => __async(null, null, function* () {
+        if (!response.ok) {
+          throw new Error(`URL configuration request failed: ${response.status}`);
+        }
+        const data = yield response.json();
+        console.log("Fetched provider URL configuration");
+        cache.data = data;
+        cache.expiresAt = Date.now() + cacheTtl;
+        return data;
+      })).catch((error) => {
+        if (cache.data) {
+          console.warn("Using stale provider URL configuration", error);
+          return cache.data;
+        }
+        throw error;
+      });
+    }
+    request.finally(() => {
+      cache.request = void 0;
+    });
+    Object.defineProperty(cache, "request", {
+      configurable: true,
+      enumerable: false,
+      value: request,
+      writable: true
+    });
+    return request;
+  });
+}
+__name(fetchProviderUrls, "fetchProviderUrls");
+var getBaseUrl = /* @__PURE__ */ __name((providerValue) => __async(null, null, function* () {
+  var _a, _b;
+  try {
+    const providerUrls = yield fetchProviderUrls();
+    return (_b = (_a = providerUrls[providerValue]) == null ? void 0 : _a.url) != null ? _b : "";
+  } catch (error) {
+    console.error(`Error fetching baseUrl: ${providerValue}`, error);
+    throw error;
+  }
+}), "getBaseUrl");
+
+// providers/providerErrors.ts
+function getErrorMessage(error) {
+  if (error instanceof Error) return error.message;
+  if (typeof error === "string") return error;
+  try {
+    return JSON.stringify(error);
+  } catch (e) {
+    return String(error);
+  }
+}
+__name(getErrorMessage, "getErrorMessage");
+function throwProviderError(provider, operation, error) {
+  var _a, _b;
+  const response = error == null ? void 0 : error.response;
+  const status = response == null ? void 0 : response.status;
+  const statusText = response == null ? void 0 : response.statusText;
+  const url = ((_a = response == null ? void 0 : response.config) == null ? void 0 : _a.url) || ((_b = error == null ? void 0 : error.config) == null ? void 0 : _b.url);
+  const details = [
+    status ? `HTTP ${status}${statusText ? ` ${statusText}` : ""}` : "",
+    url ? `URL ${url}` : "",
+    getErrorMessage(error)
+  ].filter(Boolean);
+  throw new Error(`${provider} ${operation} failed: ${details.join(" | ")}`);
+}
+__name(throwProviderError, "throwProviderError");
+
+// providers/4khdhub/posts.ts
+var getPosts = /* @__PURE__ */ __name(function(_0) {
+  return __async(this, arguments, function* ({
+    filter,
+    page,
+    signal,
+    providerContext
+  }) {
+    const { cheerio } = providerContext;
+    const baseUrl = yield getBaseUrl("4khdhub");
+    const url = `${baseUrl + filter}/page/${page}`;
+    console.log("4khdhubGetPosts url", url);
+    return posts({ baseUrl, url, signal, cheerio, operation: "posts" });
+  });
+}, "getPosts");
+var getSearchPosts = /* @__PURE__ */ __name(function(_0) {
+  return __async(this, arguments, function* ({
+    searchQuery,
+    page,
+    signal,
+    providerContext
+  }) {
+    const { cheerio } = providerContext;
+    const baseUrl = yield getBaseUrl("4khdhub");
+    const url = page == 1 ? `${baseUrl}/?s=${searchQuery}` : `${baseUrl}/page/${page}?s=${searchQuery}`;
+    console.log("4khdhubGetSearchPosts url", url);
+    return posts({ baseUrl, url, signal, cheerio, operation: "search posts" });
+  });
+}, "getSearchPosts");
+function posts(_0) {
+  return __async(this, arguments, function* ({
+    baseUrl,
+    url,
+    signal,
+    cheerio,
+    operation
+  }) {
+    try {
+      const res = yield fetch(url, { signal });
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status} ${res.statusText} | URL ${url}`);
+      }
+      const data = yield res.text();
+      const $ = cheerio.load(data);
+      const catalog = [];
+      $(".card-grid").children().map((i, element) => {
+        const title = $(element).find(".movie-card-title").text();
+        const link = $(element).attr("href");
+        const image = $(element).find("img").attr("src");
+        if (title && link && image) {
+          const postUrl = new URL(link, `${baseUrl}/`);
+          catalog.push({
+            title,
+            link: `${postUrl.pathname}${postUrl.search}${postUrl.hash}`,
+            image
+          });
+        }
+      });
+      return catalog;
+    } catch (err) {
+      throwProviderError("4KHDHub", operation, err);
+    }
+  });
+}
+__name(posts, "posts");
+exports.getPosts = getPosts;
+exports.getSearchPosts = getSearchPosts;
+// Annotate the CommonJS export names for ESM import in node:
+

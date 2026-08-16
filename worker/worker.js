@@ -20,8 +20,9 @@ const ROOT = process.env.PROVIDERS_ROOT || path.join(__dirname, '..');
 const DIST = path.join(ROOT, 'dist');
 const URLS_JSON = path.join(ROOT, 'urls.json');
 // Manifest endpoint configured via URLS_MANIFEST_URL (see .env.example).
-// Empty = the bundles fetch their built-in default URL straight from the
-// network; set = we intercept that exact URL and fall back to the local copy.
+// Empty = bundles read urls.json from the local project directory (no
+// network); set = we intercept that exact URL and fall back to the local
+// copy on failure.
 const URLS_MANIFEST_URL = (process.env.URLS_MANIFEST_URL || '').trim();
 
 const WORKER_TIMEOUT_MS = Number(process.env.WORKER_TIMEOUT_MS || 60000);
