@@ -1,0 +1,25 @@
+{
+  "version": 2,
+  "buildCommand": "node scripts/vercel-bundle.js",
+  "builds": [
+    {
+      "src": "netlify-functions/api.vercel.mjs",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": [
+          "dist/**/*.js",
+          "urls.json",
+          "manifest.json",
+          "static/index.html",
+          "netlify-functions/node_modules/**"
+        ]
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "netlify-functions/api.vercel.mjs"
+    }
+  ]
+}
