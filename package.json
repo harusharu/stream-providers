@@ -2,8 +2,6 @@
   "name": "stream-providers",
   "version": "1.0.0",
   "description": "Self-hosted stream provider source bundles for the Rust/Actix and Hono APIs.",
-  "license": "MIT",
-  "author": "",
   "private": true,
   "type": "commonjs",
   "engines": {
