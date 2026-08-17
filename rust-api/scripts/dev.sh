@@ -6,11 +6,11 @@
 # on change (npm run build) so the Node workers always load fresh dist code.
 #
 # Usage:
-#   ./scripts/dev.sh                 # run + watch (best experience)
-#   ./scripts/dev.sh --no-watch      # plain `cargo run`, no watchers
+#   ./rust-api/scripts/dev.sh         # run + watch (best experience)
+#   ./rust-api/scripts/dev.sh --no-watch      # plain `cargo run`, no watchers
 set -euo pipefail
 
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 
 WATCH=1
 if [[ "${1:-}" == "--no-watch" ]]; then
@@ -35,7 +35,7 @@ if [[ "$WATCH" == "1" ]]; then
   # sources for a gateway reload. cargo-watch restarts on its own targets;
   # the bundle rebuild is a background loop. The marker file records the last
   # successful build so we only rebuild when a provider .ts is newer.
-  MARKER="$(pwd)/target/.provider-build-marker"
+  MARKER="$(pwd)/rust-api/target/.provider-build-marker"
   mkdir -p "$(dirname "$MARKER")"
   if ! find dist -type f -newer "$MARKER" 2>/dev/null | grep -q .; then
     touch "$MARKER"
@@ -57,11 +57,11 @@ if [[ "$WATCH" == "1" ]]; then
   BUNDLE_PID=$!
   trap 'kill $BUNDLE_PID 2>/dev/null || true' EXIT
 
-  exec cargo watch -x "run" \
-    --watch src \
+  exec cargo watch -x "run --manifest-path rust-api/Cargo.toml" \
+    --watch rust-api/src \
     --watch providers \
     --watch manifest.json \
-    --watch worker
+    --watch rust-api/worker
 else
-  exec cargo run
+  exec cargo run --manifest-path rust-api/Cargo.toml
 fi

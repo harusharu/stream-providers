@@ -9,7 +9,7 @@
 //! | --- | --- | --- |
 //! | `HOST` | `0.0.0.0` | Bind address |
 //! | `PORT` | `8787` | Bind port |
-//! | `PROVIDERS_ROOT` | repo root (cwd) | Repo root containing `dist/` + `urls.json` |
+//! | `PROVIDERS_ROOT` | repo root (parent of `rust-api/`) | Repo root containing `dist/` + `urls.json` |
 //! | `URLS_MANIFEST_URL` | unset | Optional manifest endpoint for `getBaseUrl()`; unset = read local `urls.json` (updated by the `check-urls` GitHub Action) |
 //! | `DEFAULT_PROVIDER` | `vega` | Provider id used when `provider` is omitted |
 //! | `WORKER_COUNT` | CPU count | Number of Node sidecar processes |
@@ -29,7 +29,7 @@
 //!
 //! See [`Config::from_env`].
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 /// Process-wide configuration. Constructed once at startup and shared (via
 /// [`std::sync::Arc`]) with the worker pool and every request handler.
@@ -112,14 +112,17 @@ impl Config {
         dotenvy::dotenv().ok();
 
         let providers_root = env_path("PROVIDERS_ROOT").unwrap_or_else(|| {
-            // Default to the stream-providers repo root (this directory —
-            // the Rust project now lives at the repo root).
-            std::env::current_dir()
-                .ok()
-                .or_else(|| Some(PathBuf::from(".")))
-                .unwrap()
+            // Default to the stream-providers repo root (the parent of the
+            // crate dir — the Rust project lives in `rust-api/`).
+            PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+                .parent()
+                .map(Path::to_path_buf)
+                .unwrap_or_else(|| PathBuf::from("."))
         });
-        let worker_script = providers_root.join("worker").join("worker.js");
+        let worker_script = providers_root
+            .join("rust-api")
+            .join("worker")
+            .join("worker.js");
 
         let default_provider = std::env::var("DEFAULT_PROVIDER").unwrap_or_else(|_| "vega".into());
 
@@ -319,7 +322,10 @@ mod tests {
                 assert_eq!(c.default_provider, "showbox");
                 assert_eq!(c.log_level, "debug");
                 assert_eq!(c.providers_root, tmp.path());
-                assert_eq!(c.worker_script, tmp.path().join("worker").join("worker.js"));
+                assert_eq!(
+                    c.worker_script,
+                    tmp.path().join("rust-api").join("worker").join("worker.js")
+                );
             },
         );
     }

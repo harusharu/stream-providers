@@ -16,7 +16,8 @@ const readline = require('readline');
 const path = require('path');
 const fs = require('fs');
 
-const ROOT = process.env.PROVIDERS_ROOT || path.join(__dirname, '..');
+// The worker lives at rust-api/worker/; the repo root is two levels up.
+const ROOT = process.env.PROVIDERS_ROOT || path.join(__dirname, '..', '..');
 const DIST = path.join(ROOT, 'dist');
 const URLS_JSON = path.join(ROOT, 'urls.json');
 // Manifest endpoint configured via URLS_MANIFEST_URL (see .env.example).

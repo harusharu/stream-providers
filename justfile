@@ -16,7 +16,7 @@ help:
 # --- dependencies -----------------------------------------------------------
 setup:
     {{npm}} ci
-    {{npm}} --prefix netlify-functions ci
+    {{npm}} --prefix hono-api ci
 
 # --- provider bundles -------------------------------------------------------
 bundles:
@@ -28,52 +28,52 @@ bundles-dev:
 # --- typecheck & format (both code trees) -----------------------------------
 typecheck:
     {{npm}} run typecheck
-    {{npm}} --prefix netlify-functions run typecheck
+    {{npm}} --prefix hono-api run typecheck
 
 format:
     {{npm}} run format
-    {{npm}} --prefix netlify-functions run format
+    {{npm}} --prefix hono-api run format
 
 format-check:
     {{npm}} run format:check
-    {{npm}} --prefix netlify-functions run format:check
+    {{npm}} --prefix hono-api run format:check
 
 # --- Rust gateway ------------------------------------------------------------
 build-rust:
-    {{cargo}} build
+    cd rust-api && {{cargo}} build
 
 release:
-    ./scripts/build.sh
+    ./rust-api/scripts/build.sh
 
 dev:
-    {{cargo}} run
+    cd rust-api && {{cargo}} run
 
 watch:
-    ./scripts/dev.sh
+    ./rust-api/scripts/dev.sh
 
 fmt:
-    {{cargo}} fmt
+    cd rust-api && {{cargo}} fmt
 
 lint:
-    {{cargo}} clippy --all-targets -- -D warnings
+    cd rust-api && {{cargo}} clippy --all-targets -- -D warnings
 
 test:
-    {{cargo}} test --lib
-    {{cargo}} test --test integration
+    cd rust-api && {{cargo}} test --lib
+    cd rust-api && {{cargo}} test --test integration
 
 e2e:
     {{npm}} run build
-    {{cargo}} test --test e2e -- --ignored --test-threads=1
+    cd rust-api && {{cargo}} test --test e2e -- --ignored --test-threads=1
 
 docs:
-    {{cargo}} doc --no-deps --document-private-items
+    cd rust-api && {{cargo}} doc --no-deps --document-private-items
 
 docker:
     docker build -t harustream-provider-api .
 
 # --- Node gateway (same port as Rust — swap the backend without touching config) ---
 dev-node:
-    PORT={{port}} node netlify-functions/lib/adapters/node.ts
+    PORT={{port}} node hono-api/lib/adapters/node.ts
 
 # --- functional API suite (run against a running gateway) --------------------
 test-api quick='':
@@ -85,13 +85,13 @@ url-check:
 
 # --- CI gate -----------------------------------------------------------------
 check:
-    {{cargo}} fmt --check
-    {{cargo}} clippy --all-targets -- -D warnings
-    {{cargo}} test --lib
-    {{cargo}} test --test integration
+    cd rust-api && {{cargo}} fmt --check
+    cd rust-api && {{cargo}} clippy --all-targets -- -D warnings
+    cd rust-api && {{cargo}} test --lib
+    cd rust-api && {{cargo}} test --test integration
     {{npm}} run typecheck
-    {{npm}} --prefix netlify-functions run typecheck
+    {{npm}} --prefix hono-api run typecheck
 
 # --- cleanup ------------------------------------------------------------------
 clean:
-    {{cargo}} clean
+    cd rust-api && {{cargo}} clean

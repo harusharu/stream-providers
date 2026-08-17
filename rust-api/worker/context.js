@@ -23,7 +23,8 @@ const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
 
-const ROOT = process.env.PROVIDERS_ROOT || path.join(__dirname, '..');
+// The worker lives at rust-api/worker/; the repo root is two levels up.
+const ROOT = process.env.PROVIDERS_ROOT || path.join(__dirname, '..', '..');
 const URLS_JSON = path.join(ROOT, 'urls.json');
 const URLS_MANIFEST_URL = (process.env.URLS_MANIFEST_URL || '').trim();
 

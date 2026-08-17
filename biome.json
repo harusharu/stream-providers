@@ -26,8 +26,10 @@
   "files": {
     "includes": [
       "providers/**",
-      "worker/**",
-      "netlify-functions/**",
+      "rust-api/worker/**",
+      "hono-api/api.ts",
+      "hono-api/lib/**",
+      "hono-api/scripts/**",
       "build-bundled.js",
       "scripts/**",
       "static/**",

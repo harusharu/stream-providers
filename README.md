@@ -14,16 +14,33 @@ hosters).
 - `stream-providers` ships browser bundles (`dist/*.js`) with no HTTP API.
 - `dist/providerContext.js` is broken in plain Node ("Class extends value
   undefined is not a constructor or null"), so the sidecar worker
-  (`worker/context.js`) re-implements the provider context in plain JS.
+  (`rust-api/worker/context.js`) re-implements the provider context in plain JS.
 - Some upstream sites require a real Chrome TLS fingerprint; the Node workers
   satisfy that via `curl-cffi-node` (`impersonate: "chrome120"`).
+
+## Repository layout
+
+The repo hosts three independent code trees plus shared payloads:
+
+```
+/
+├── rust-api/          # Rust/Actix gateway (src/, Cargo.toml, worker/, tests/)
+├── hono-api/          # Node/Hono gateway (own package.json, deployable to Netlify/Vercel/plain Node)
+├── providers/         # TypeScript provider sources (single source of truth)
+├── dist/              # built provider bundles (npm run build output)
+├── static/            # shared dashboard (served by both gateways)
+├── scripts/           # scripts shared by 2+ components (api-suite.js)
+├── manifest.json      # shared provider registry
+├── urls.json          # shared provider URL manifest (auto-updated by CI)
+└── justfile           # command runner (just, not make)
+```
 
 ## Architecture
 
 The crate is split into small, single-purpose modules:
 
 ```
-src/
+rust-api/src/
 ├── main.rs           binary entrypoint: config → state → bind (HTTP/TLS) → graceful shutdown
 ├── lib.rs            crate docs + module tree
 ├── app.rs            build_app(): routes, CORS, security middleware, 404 handler
@@ -92,7 +109,7 @@ Requirements: Rust 1.85+ toolchain, Node 20+ (for `curl-cffi-node`), and the
 ```bash
 cd stream-providers
 cp .env.example .env            # optional; defaults work
-cargo build --release
+cd rust-api && cargo build --release
 ./target/release/harustream-provider-api
 ```
 
@@ -128,10 +145,9 @@ docker run -p 8787:8787 \
 
 ## Development
 
-The Rust/Actix gateway is the single development environment for this project —
-the old Node dev server has been removed. Provider bundles are still compiled
-with `npm run build` (they are the payload the Rust worker pool executes), but
-everyday work happens in Rust.
+Commands run through `just` (see the `justfile` for the full list). Provider
+bundles are compiled with `npm run build` (they are the payload both gateways
+execute).
 
 Prerequisites: Rust toolchain, Node 20+ (runtime dep for the worker pool), and
 the repo's `node_modules` (for `axios`, `cheerio`, `curl-cffi-node`).
@@ -139,33 +155,36 @@ the repo's `node_modules` (for `axios`, `cheerio`, `curl-cffi-node`).
 ### Quick start
 
 ```bash
-npm install                # once: installs axios/cheerio/curl-cffi-node
-npm run build              # once (and after provider changes): compile bundles
+just setup               # once: npm ci at root + in hono-api/
+npm run build            # once (and after provider changes): compile bundles
 
-make dev                   # cargo run (debug) with defaults
+just dev                 # cargo run (debug) with defaults
+just dev-node            # Hono gateway on the same port
 ```
 
-### Makefile targets
+### justfile targets
 
 ```bash
-make dev         # run the gateway in debug mode on :8787
-make watch       # auto-reload on Rust + provider bundle changes (cargo-watch)
-make test        # unit + integration tests (no Node, no network)
-make check       # fmt + clippy + docs + tests — the full CI gate
-make lint        # cargo clippy --all-targets -- -D warnings
-make fmt         # cargo fmt (in place)
-make release     # optimized build
-make docker      # container image
+just dev         # run the Rust gateway in debug mode on :8787
+just dev-node    # run the Hono gateway on the same port (no Rust)
+just watch       # auto-reload on Rust + provider bundle changes (cargo-watch)
+just test        # unit + integration tests (no Node, no network)
+just check       # fmt + clippy + tests + both typechecks — the full CI gate
+just lint        # cargo clippy --all-targets -- -D warnings
+just fmt         # cargo fmt (in place)
+just release     # optimized build
+just docker      # container image
 ```
 
-`make watch` (equivalently `./scripts/dev.sh`) watches `src/`, `worker/`, and
-`providers/`; it rebuilds the provider bundles on TS changes and reloads the
-gateway, so editing a provider or the Rust code gives you a live dev loop.
+`just watch` (equivalently `./rust-api/scripts/dev.sh`) watches
+`rust-api/src/`, `rust-api/worker/`, and `providers/`; it rebuilds the provider
+bundles on TS changes and reloads the gateway, so editing a provider or the
+Rust code gives you a live dev loop.
 
 ```bash
-make watch       # installs cargo-watch on first use, then runs + reloads
+just watch       # installs cargo-watch on first use, then runs + reloads
 # or
-./scripts/dev.sh
+./rust-api/scripts/dev.sh
 ```
 
 ### Configuration in dev
@@ -174,7 +193,7 @@ Defaults mirror `Config::from_env`; override via environment or a `.env` file
 (`cp .env.example .env`):
 
 ```bash
-make dev PORT=8787 HOST=0.0.0.0 LOG_LEVEL=debug
+just dev PORT=8787 HOST=0.0.0.0 LOG_LEVEL=debug
 ```
 
 ### Tests
@@ -182,8 +201,8 @@ make dev PORT=8787 HOST=0.0.0.0 LOG_LEVEL=debug
 Fast, deterministic tests run with no Node runtime and no network:
 
 ```bash
-cargo test --lib            # unit tests (config, manifest, cache, worker, security, tls, error)
-cargo test --test integration   # full app through a mock gateway (no Node, no network)
+cd rust-api && cargo test --lib            # unit tests (config, manifest, cache, worker, security, tls, error)
+cd rust-api && cargo test --test integration   # full app through a mock gateway (no Node, no network)
 ```
 
 The integration tests spin up the real Actix app with a `MockGateway` and cover
@@ -199,7 +218,7 @@ workers). Requires the repo's `node_modules` and a built `dist/`:
 
 ```bash
 npm ci && npm run build            # from the stream-providers repo root
-cargo test --test e2e -- --ignored --test-threads=1
+cd rust-api && cargo test --test e2e -- --ignored --test-threads=1
 ```
 
 The sweep is `#[ignore]`d and gated to manual CI runs because upstream hosting
@@ -209,13 +228,15 @@ but individual provider results are expected to vary day to day.
 ### CI
 
 `.github/workflows/rust-api.yml` runs fmt, clippy, unit + integration tests, and
-docs on every push/PR touching `src/`, `worker/`, `tests/`, `Cargo.*` or
-`manifest.json`. The e2e sweep is a separate `workflow_dispatch`-only job.
+docs on every push/PR touching `rust-api/src/`, `rust-api/worker/`,
+`rust-api/tests/`, `rust-api/Cargo.*` or `manifest.json`. The e2e sweep is a
+separate `workflow_dispatch`-only job.
 
-Worker changes live in `worker/worker.js` (protocol) and `worker/context.js`
-(provider runtime shim) and can be smoke-tested independently:
+Worker changes live in `rust-api/worker/worker.js` (protocol) and
+`rust-api/worker/context.js` (provider runtime shim) and can be smoke-tested
+independently:
 
 ```bash
-PROVIDERS_ROOT=$(pwd) node worker/worker.js
-printf '%s\n' '{"id":1,"method":"call","params":{"provider":"vega","module":"catalog","fn":"catalog","args":{}}}' | node worker/worker.js
+PROVIDERS_ROOT=$(pwd) node rust-api/worker/worker.js
+printf '%s\n' '{"id":1,"method":"call","params":{"provider":"vega","module":"catalog","fn":"catalog","args":{}}}' | PROVIDERS_ROOT=$(pwd) node rust-api/worker/worker.js
 ```

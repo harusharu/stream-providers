@@ -43,7 +43,7 @@
 //! | Problem | Solution |
 //! | --- | --- |
 //! | Bundles expose no REST API | The Rust gateway adds one (`/api/*`) |
-//! | `providerContext.js` broken in Node | `worker/context.js` re-implements the provider runtime (axios adapter + fetch shim + cheerio) in plain JS |
+//! | `providerContext.js` broken in Node | `rust-api/worker/context.js` re-implements the provider runtime (axios adapter + fetch shim + cheerio) in plain JS |
 //! | Upstream blocks default TLS | Node workers use `curl-cffi-node` with `impersonate: "chrome120"` |
 //! | Slow scraping calls block the server | A bounded worker pool + per-endpoint TTL caching |
 //! | Public API abuse | Per-IP rate limiting, CORS allow-listing, request-id tracing |
@@ -127,7 +127,7 @@
 //!
 //! Provider bundles import a `providerContext` object. The original
 //! `dist/providerContext.js` does not load under plain Node, so
-//! `worker/context.js` builds an equivalent at runtime:
+//! `rust-api/worker/context.js` builds an equivalent at runtime:
 //!
 //! - `axios` — the real `axios` from the repo's `node_modules`, patched to use
 //!   `curl-cffi-node` so requests impersonate Chrome 120.
@@ -256,8 +256,6 @@
 //!
 //! - **Docker**: `docker build -t harustream-provider-api .` then run with the
 //!   `stream-providers` repo mounted at `/opt/providers` (`PROVIDERS_ROOT=/opt/providers`).
-//! - **GitHub Pages**: this documentation is built from the crate docs and
-//!   deployed by the `rustdoc.yml` workflow (manual `workflow_dispatch`).
 //!
 //! # Related repositories
 //!

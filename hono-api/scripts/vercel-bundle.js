@@ -9,17 +9,17 @@
 // This script bundles the Vercel adapter into one self-contained ESM file
 // (all lib code + hono inlined). The dynamically-required runtime deps are
 // shipped into the lambda via `includeFiles` in vercel.json
-// (`netlify-functions/node_modules/**`).
+// (`hono-api/node_modules/**`).
 
-const esbuild = require('esbuild');
-const path = require('path');
+import esbuild from 'esbuild';
+import path from 'node:path';
 
-const root = path.join(__dirname, '..');
+const root = path.join(import.meta.dirname, '..');
 
 esbuild
   .build({
-    entryPoints: [path.join(root, 'netlify-functions', 'lib', 'adapters', 'vercel.ts')],
-    outfile: path.join(root, 'netlify-functions', 'api.vercel.mjs'),
+    entryPoints: [path.join(root, 'lib', 'adapters', 'vercel.ts')],
+    outfile: path.join(root, 'api.vercel.mjs'),
     bundle: true,
     format: 'esm',
     platform: 'node',

@@ -1,11 +1,11 @@
-// netlify-functions/node_modules/hono/dist/adapter/netlify/handler.js
+// hono-api/node_modules/hono/dist/adapter/netlify/handler.js
 var handle = (app2) => {
   return (req, context) => {
     return app2.fetch(req, { context });
   };
 };
 
-// netlify-functions/node_modules/hono/dist/compose.js
+// hono-api/node_modules/hono/dist/compose.js
 var compose = (middleware, onError, onNotFound) => {
   return (context, next) => {
     let index = -1;
@@ -49,10 +49,10 @@ var compose = (middleware, onError, onNotFound) => {
   };
 };
 
-// netlify-functions/node_modules/hono/dist/request/constants.js
+// hono-api/node_modules/hono/dist/request/constants.js
 var GET_MATCH_RESULT = /* @__PURE__ */ Symbol();
 
-// netlify-functions/node_modules/hono/dist/utils/buffer.js
+// hono-api/node_modules/hono/dist/utils/buffer.js
 var bufferToFormData = (arrayBuffer, contentType) => {
   const response = new Response(arrayBuffer, {
     headers: {
@@ -63,7 +63,7 @@ var bufferToFormData = (arrayBuffer, contentType) => {
   return response.formData();
 };
 
-// netlify-functions/node_modules/hono/dist/utils/body.js
+// hono-api/node_modules/hono/dist/utils/body.js
 var isRawRequest = (request) => "headers" in request;
 var parseBody = async (request, options = /* @__PURE__ */ Object.create(null)) => {
   const { all = false, dot = false } = options;
@@ -149,7 +149,7 @@ var handleParsingNestedValues = (form, key, value) => {
   });
 };
 
-// netlify-functions/node_modules/hono/dist/utils/url.js
+// hono-api/node_modules/hono/dist/utils/url.js
 var splitPath = (path) => {
   const paths = path.split("/");
   if (paths[0] === "") {
@@ -351,7 +351,7 @@ var getQueryParams = (url, key) => {
 };
 var decodeURIComponent_ = decodeURIComponent;
 
-// netlify-functions/node_modules/hono/dist/request.js
+// hono-api/node_modules/hono/dist/request.js
 var HonoRequest = class {
   /**
    * `.raw` can get the raw Request object.
@@ -632,7 +632,7 @@ var HonoRequest = class {
   }
 };
 
-// netlify-functions/node_modules/hono/dist/utils/html.js
+// hono-api/node_modules/hono/dist/utils/html.js
 var HtmlEscapedCallbackPhase = {
   Stringify: 1,
   BeforeStream: 2,
@@ -674,7 +674,7 @@ var resolveCallback = async (str2, phase, preserveCallbacks, context, buffer) =>
   }
 };
 
-// netlify-functions/node_modules/hono/dist/context.js
+// hono-api/node_modules/hono/dist/context.js
 var TEXT_PLAIN = "text/plain; charset=UTF-8";
 var setDefaultContentType = (contentType, headers) => {
   return {
@@ -1096,7 +1096,7 @@ var Context = class {
   };
 };
 
-// netlify-functions/node_modules/hono/dist/router.js
+// hono-api/node_modules/hono/dist/router.js
 var METHOD_NAME_ALL = "ALL";
 var METHOD_NAME_ALL_LOWERCASE = "all";
 var METHODS = ["get", "post", "put", "delete", "options", "patch", "query"];
@@ -1104,10 +1104,10 @@ var MESSAGE_MATCHER_IS_ALREADY_BUILT = "Can not add a route since the matcher is
 var UnsupportedPathError = class extends Error {
 };
 
-// netlify-functions/node_modules/hono/dist/utils/constants.js
+// hono-api/node_modules/hono/dist/utils/constants.js
 var COMPOSED_HANDLER = "__COMPOSED_HANDLER";
 
-// netlify-functions/node_modules/hono/dist/hono-base.js
+// hono-api/node_modules/hono/dist/hono-base.js
 var notFoundHandler = (c) => {
   return c.text("404 Not Found", 404);
 };
@@ -1484,7 +1484,7 @@ var Hono = class _Hono {
   };
 };
 
-// netlify-functions/node_modules/hono/dist/router/reg-exp-router/matcher.js
+// hono-api/node_modules/hono/dist/router/reg-exp-router/matcher.js
 var emptyParam = [];
 function match(method, path) {
   const matchers = this.buildAllMatchers();
@@ -1505,7 +1505,7 @@ function match(method, path) {
   return match2(method, path);
 }
 
-// netlify-functions/node_modules/hono/dist/router/reg-exp-router/node.js
+// hono-api/node_modules/hono/dist/router/reg-exp-router/node.js
 var LABEL_REG_EXP_STR = "[^/]+";
 var ONLY_WILDCARD_REG_EXP_STR = ".*";
 var TAIL_WILDCARD_REG_EXP_STR = "(?:|/.*)";
@@ -1612,7 +1612,7 @@ var Node = class _Node {
   }
 };
 
-// netlify-functions/node_modules/hono/dist/router/reg-exp-router/trie.js
+// hono-api/node_modules/hono/dist/router/reg-exp-router/trie.js
 var Trie = class {
   #context = { varIndex: 0 };
   #root = new Node();
@@ -1676,7 +1676,7 @@ var Trie = class {
   }
 };
 
-// netlify-functions/node_modules/hono/dist/router/reg-exp-router/router.js
+// hono-api/node_modules/hono/dist/router/reg-exp-router/router.js
 var wildcardRegExpCache = /* @__PURE__ */ Object.create(null);
 function buildWildcardRegExp(path) {
   return wildcardRegExpCache[path] ??= new RegExp(
@@ -1834,7 +1834,7 @@ var RegExpRouter = class {
   }
 };
 
-// netlify-functions/node_modules/hono/dist/router/smart-router/router.js
+// hono-api/node_modules/hono/dist/router/smart-router/router.js
 var SmartRouter = class {
   name = "SmartRouter";
   #routers = [];
@@ -1889,7 +1889,7 @@ var SmartRouter = class {
   }
 };
 
-// netlify-functions/node_modules/hono/dist/router/trie-router/node.js
+// hono-api/node_modules/hono/dist/router/trie-router/node.js
 var emptyParams = /* @__PURE__ */ Object.create(null);
 var hasChildren = (children) => {
   for (const _ in children) {
@@ -2073,7 +2073,7 @@ var Node2 = class _Node2 {
   }
 };
 
-// netlify-functions/node_modules/hono/dist/router/trie-router/router.js
+// hono-api/node_modules/hono/dist/router/trie-router/router.js
 var TrieRouter = class {
   name = "TrieRouter";
   #node;
@@ -2095,7 +2095,7 @@ var TrieRouter = class {
   }
 };
 
-// netlify-functions/node_modules/hono/dist/hono.js
+// hono-api/node_modules/hono/dist/hono.js
 var Hono2 = class extends Hono {
   /**
    * Creates an instance of the Hono class.
@@ -2110,7 +2110,7 @@ var Hono2 = class extends Hono {
   }
 };
 
-// netlify-functions/node_modules/hono/dist/middleware/cors/index.js
+// hono-api/node_modules/hono/dist/middleware/cors/index.js
 var cors = (options) => {
   const opts = {
     origin: "*",
@@ -2195,7 +2195,7 @@ var cors = (options) => {
   };
 };
 
-// netlify-functions/lib/cache.ts
+// hono-api/lib/cache.ts
 var TtlCache = class {
   store = /* @__PURE__ */ new Map();
   inflight = /* @__PURE__ */ new Map();
@@ -2280,7 +2280,7 @@ var CacheBundle = class {
   }
 };
 
-// netlify-functions/lib/config.ts
+// hono-api/lib/config.ts
 function int(value, fallback) {
   if (value === void 0) return fallback;
   const n = Number.parseInt(value, 10);
@@ -2344,7 +2344,7 @@ function validate(config) {
   return problems;
 }
 
-// netlify-functions/lib/errors.ts
+// hono-api/lib/errors.ts
 var ApiError = class _ApiError extends Error {
   status;
   code;
@@ -2416,11 +2416,11 @@ function notFoundBody() {
   return { success: false, error: "not found", code: "NOT_FOUND" };
 }
 
-// netlify-functions/lib/gateway.ts
+// hono-api/lib/gateway.ts
 import { existsSync as existsSync3 } from "node:fs";
 import { join as join3 } from "node:path";
 
-// netlify-functions/lib/bundles.ts
+// hono-api/lib/bundles.ts
 import { existsSync } from "node:fs";
 import { createRequire } from "node:module";
 import { join } from "node:path";
@@ -2495,7 +2495,7 @@ function abortSignalWithTimeout(ms) {
   return controller.signal;
 }
 
-// netlify-functions/lib/context.ts
+// hono-api/lib/context.ts
 import { existsSync as existsSync2, readFileSync } from "node:fs";
 import { createRequire as createRequire2 } from "node:module";
 import { join as join2 } from "node:path";
@@ -2689,7 +2689,7 @@ function buildProviderContext(providersRoot) {
   };
 }
 
-// netlify-functions/lib/model.ts
+// hono-api/lib/model.ts
 function normalizeProvider(raw2, fallback) {
   const trimmed = (raw2 ?? "").trim();
   return trimmed === "" ? fallback : trimmed;
@@ -2746,7 +2746,7 @@ function applyTypeHints(data) {
   });
 }
 
-// netlify-functions/lib/remote.ts
+// hono-api/lib/remote.ts
 var COOLDOWN_MS = 3e4;
 var MAX_CONSECUTIVE_FAILURES = 2;
 function fromRemoteEnvelope(envelope, httpStatus) {
@@ -2920,7 +2920,7 @@ var ENDPOINT_MAP = {
   }
 };
 
-// netlify-functions/lib/gateway.ts
+// hono-api/lib/gateway.ts
 var Semaphore = class {
   active = 0;
   waiters = [];
@@ -3097,7 +3097,7 @@ var Gateway = class {
   }
 };
 
-// netlify-functions/lib/handlers/helpers.ts
+// hono-api/lib/handlers/helpers.ts
 function state(c) {
   return c.get("state");
 }
@@ -3114,7 +3114,7 @@ function cached(c, data, ttlSecs) {
   return c.json({ success: true, data });
 }
 
-// netlify-functions/lib/handlers/catalog.ts
+// hono-api/lib/handlers/catalog.ts
 async function catalog(c) {
   const { gateway, caches } = state(c);
   const provider = resolveProvider(c, c.req.query("provider"));
@@ -3127,7 +3127,7 @@ async function catalog(c) {
   return cached(c, data, ttl);
 }
 
-// netlify-functions/lib/handlers/episodes.ts
+// hono-api/lib/handlers/episodes.ts
 async function episodes(c) {
   const { gateway, caches } = state(c);
   const provider = resolveProvider(c, c.req.query("provider"));
@@ -3142,7 +3142,7 @@ async function episodes(c) {
   return cached(c, data, ttl);
 }
 
-// netlify-functions/lib/handlers/meta.ts
+// hono-api/lib/handlers/meta.ts
 async function meta(c) {
   const { gateway, caches } = state(c);
   const provider = resolveProvider(c, c.req.query("provider"));
@@ -3157,7 +3157,7 @@ async function meta(c) {
   return cached(c, data, ttl);
 }
 
-// netlify-functions/lib/handlers/search.ts
+// hono-api/lib/handlers/search.ts
 async function search(c) {
   const { gateway, caches } = state(c);
   const provider = resolveProvider(c, c.req.query("provider"));
@@ -3173,7 +3173,7 @@ async function search(c) {
   return cached(c, applyTypeHints(raw2), ttl);
 }
 
-// netlify-functions/lib/handlers/search-all.ts
+// hono-api/lib/handlers/search-all.ts
 function parseProviders(raw2) {
   if (raw2 === void 0) return [];
   return raw2.split(",").map((s) => s.trim()).filter((s) => s.length > 0);
@@ -3197,7 +3197,7 @@ async function searchAll(c) {
   return c.json({ success: true, data: { success: true, data, total, providers: providers2, failed } });
 }
 
-// netlify-functions/lib/handlers/stream.ts
+// hono-api/lib/handlers/stream.ts
 async function stream(c) {
   const { gateway, caches } = state(c);
   const provider = resolveProvider(c, c.req.query("provider"));
@@ -3213,7 +3213,7 @@ async function stream(c) {
   return cached(c, data, ttl);
 }
 
-// netlify-functions/lib/handlers/system.ts
+// hono-api/lib/handlers/system.ts
 import { existsSync as existsSync4, readFileSync as readFileSync2 } from "node:fs";
 import { join as join4 } from "node:path";
 async function health(c) {
@@ -3288,7 +3288,7 @@ function tryReadDashboard(providersRoot) {
   return null;
 }
 
-// netlify-functions/lib/providers.ts
+// hono-api/lib/providers.ts
 import { existsSync as existsSync5, readFileSync as readFileSync3 } from "node:fs";
 import { join as join5 } from "node:path";
 var STATIC_PROVIDERS = [
@@ -3375,7 +3375,7 @@ var ProviderRegistry = class _ProviderRegistry {
   }
 };
 
-// netlify-functions/lib/rate-limit.ts
+// hono-api/lib/rate-limit.ts
 var RateLimiter = class {
   buckets = /* @__PURE__ */ new Map();
   perMin;
@@ -3419,7 +3419,7 @@ var RateLimiter = class {
   }
 };
 
-// netlify-functions/lib/security.ts
+// hono-api/lib/security.ts
 import { randomBytes } from "node:crypto";
 var REQUEST_ID_HEADER = "x-request-id";
 var SECURITY_HEADERS = [
@@ -3481,7 +3481,7 @@ function securityMiddleware(config, limiter) {
   };
 }
 
-// netlify-functions/lib/app.ts
+// hono-api/lib/app.ts
 var singleton = null;
 function loadState(config) {
   if (singleton) return singleton;
@@ -3541,11 +3541,11 @@ function corsHandler(state2) {
   return buildCors(state2.config.corsOrigins);
 }
 
-// netlify-functions/api.ts
+// hono-api/api.ts
 var app = buildApp();
 var handler = handle(app);
 
-// netlify-functions/lib/adapters/vercel.ts
+// hono-api/lib/adapters/vercel.ts
 async function vercelHandler(req) {
   return app.fetch(req);
 }

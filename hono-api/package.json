@@ -19,6 +19,13 @@
     "curl-cffi-node": "0.1.8",
     "hono": "^4.6.0"
   },
+  "overrides": {
+    "curl-cffi-node-darwin-arm64": "npm:@curl-cffi-node/darwin-arm64@0.1.8",
+    "curl-cffi-node-darwin-x64": "npm:@curl-cffi-node/darwin-x64@0.1.8",
+    "curl-cffi-node-linux-arm64-gnu": "npm:@curl-cffi-node/linux-arm64-gnu@0.1.8",
+    "curl-cffi-node-linux-x64-gnu": "npm:@curl-cffi-node/linux-x64-gnu@0.1.8",
+    "curl-cffi-node-win32-x64-msvc": "npm:@curl-cffi-node/win32-x64-msvc@0.1.8"
+  },
   "devDependencies": {
     "@biomejs/biome": "^2.5.8",
     "@types/node": "^24.0.0",

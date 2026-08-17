@@ -1,6 +1,6 @@
 // Error taxonomy for the gateway.
 //
-// Mirrors the Rust crate's `ApiError` (src/error.rs) so the harustream client
+// Mirrors the Rust crate's `ApiError` (rust-api/src/error.rs) so the harustream client
 // can translate these into its own `ProviderError` taxonomy:
 //
 // | Error            | HTTP status | Code            |

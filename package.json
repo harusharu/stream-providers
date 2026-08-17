@@ -27,5 +27,12 @@
     "axios": "1.19.0",
     "cheerio": "1.2.0",
     "curl-cffi-node": "0.1.8"
+  },
+  "overrides": {
+    "curl-cffi-node-darwin-arm64": "npm:@curl-cffi-node/darwin-arm64@0.1.8",
+    "curl-cffi-node-darwin-x64": "npm:@curl-cffi-node/darwin-x64@0.1.8",
+    "curl-cffi-node-linux-arm64-gnu": "npm:@curl-cffi-node/linux-arm64-gnu@0.1.8",
+    "curl-cffi-node-linux-x64-gnu": "npm:@curl-cffi-node/linux-x64-gnu@0.1.8",
+    "curl-cffi-node-win32-x64-msvc": "npm:@curl-cffi-node/win32-x64-msvc@0.1.8"
   }
 }

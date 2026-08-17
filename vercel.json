@@ -1,9 +1,9 @@
 {
   "version": 2,
-  "buildCommand": "node scripts/vercel-bundle.js",
+  "buildCommand": "node hono-api/scripts/vercel-bundle.js",
   "builds": [
     {
-      "src": "netlify-functions/api.vercel.mjs",
+      "src": "hono-api/api.vercel.mjs",
       "use": "@vercel/node",
       "config": {
         "includeFiles": [
@@ -11,7 +11,7 @@
           "urls.json",
           "manifest.json",
           "static/index.html",
-          "netlify-functions/node_modules/**"
+          "hono-api/node_modules/**"
         ]
       }
     }
@@ -19,7 +19,7 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "netlify-functions/api.vercel.mjs"
+      "dest": "hono-api/api.vercel.mjs"
     }
   ]
 }

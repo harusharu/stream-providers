@@ -1,6 +1,6 @@
 //! Node sidecar worker pool and JSON-RPC-over-stdio protocol.
 //!
-//! Each worker is a `node worker/worker.js` process spawned with
+//! Each worker is a `node rust-api/worker/worker.js` process spawned with
 //! `cwd = PROVIDERS_ROOT` so `axios`, `cheerio`, and `curl-cffi-node` resolve
 //! from the repo's `node_modules`. Calls are newline-delimited JSON on stdin;
 //! responses arrive on stdout, **which carries only protocol lines** — provider

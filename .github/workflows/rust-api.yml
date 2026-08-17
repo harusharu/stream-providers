@@ -3,19 +3,19 @@ name: rust-api
 on:
   push:
     paths:
-      - 'src/**'
-      - 'worker/**'
-      - 'tests/**'
-      - 'Cargo.toml'
-      - 'Cargo.lock'
+      - 'rust-api/src/**'
+      - 'rust-api/worker/**'
+      - 'rust-api/tests/**'
+      - 'rust-api/Cargo.toml'
+      - 'rust-api/Cargo.lock'
       - 'manifest.json'
   pull_request:
     paths:
-      - 'src/**'
-      - 'worker/**'
-      - 'tests/**'
-      - 'Cargo.toml'
-      - 'Cargo.lock'
+      - 'rust-api/src/**'
+      - 'rust-api/worker/**'
+      - 'rust-api/tests/**'
+      - 'rust-api/Cargo.toml'
+      - 'rust-api/Cargo.lock'
       - 'manifest.json'
   workflow_dispatch:
 
@@ -35,17 +35,23 @@ jobs:
           components: rustfmt, clippy
 
       - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust-api
 
       - name: Format
+        working-directory: rust-api
         run: cargo fmt --check
 
       - name: Lint
+        working-directory: rust-api
         run: cargo clippy --all-targets -- -D warnings
 
       - name: Unit + integration tests
+        working-directory: rust-api
         run: cargo test --lib --test integration
 
       - name: Docs
+        working-directory: rust-api
         run: RUSTDOCFLAGS="-D warnings" cargo doc --lib --no-deps
 
   e2e:
@@ -60,6 +66,8 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust-api
 
       - uses: actions/setup-node@v4
         with:
@@ -69,4 +77,5 @@ jobs:
         run: npm ci && npm run build
 
       - name: Sweep all enabled providers
+        working-directory: rust-api
         run: cargo test --test e2e -- --ignored --test-threads=1

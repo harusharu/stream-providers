@@ -87,5 +87,5 @@ pub async fn urls_manifest(state: Data<AppState>) -> HttpResponse {
 pub async fn dashboard() -> HttpResponse {
     HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(include_str!("../../static/index.html"))
+        .body(include_str!("../../../static/index.html"))
 }
