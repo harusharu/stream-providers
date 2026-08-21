@@ -31,7 +31,7 @@ function toWebRequest(req: IncomingMessage): Request {
 
 async function sendResponse(res: ServerResponse, webResponse: Response): Promise<void> {
   const headers: Record<string, string | string[]> = {};
-  
+
   // Safely extract multiple Set-Cookie headers, as forEach would overwrite them
   webResponse.headers.forEach((value, key) => {
     if (key.toLowerCase() === 'set-cookie') {
@@ -42,7 +42,7 @@ async function sendResponse(res: ServerResponse, webResponse: Response): Promise
   });
 
   res.writeHead(webResponse.status, headers);
-  
+
   if (webResponse.body) {
     // Use stream pipe for automatic backpressure and disconnect cleanup
     Readable.fromWeb(webResponse.body as any).pipe(res);
@@ -69,7 +69,7 @@ server.listen(8787, () => {
 function shutdown() {
   console.log('shutting down');
   server.close(() => process.exit(0));
-  
+
   // Fallback if connections hang
   setTimeout(() => {
     console.error('Force closing connections after timeout');
