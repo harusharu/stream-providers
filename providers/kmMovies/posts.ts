@@ -1,6 +1,6 @@
-import { Post, ProviderContext } from '../types';
-import { getBaseUrl } from '../getBaseUrl';
-import { throwProviderError } from '../providerErrors';
+import { Post, ProviderContext } from '../_shared/types';
+import { getBaseUrl } from '../_shared/sites';
+import { throwProviderError } from '../_shared/errors';
 
 const defaultHeaders = {
   'User-Agent':
@@ -83,7 +83,7 @@ async function fetchPosts({
   providerContext: ProviderContext;
 }): Promise<Post[]> {
   try {
-    const baseUrl = await getBaseUrl('kmmovies');
+    const baseUrl = getBaseUrl('kmMovies');
     console.log('KM Movies baseUrl:', baseUrl);
     let url: string;
 

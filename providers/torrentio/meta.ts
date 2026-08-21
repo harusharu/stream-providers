@@ -4,9 +4,9 @@ import {
   CinemetaVideo,
   enrichCinemetaEpisodes,
   getCinemetaMeta,
-} from '../getCinemetaMeta';
-import { EpisodeLink, Info, Link, ProviderContext } from '../types';
-import { throwProviderError } from '../providerErrors';
+} from '../_shared/cinemeta';
+import { EpisodeLink, Info, Link, ProviderContext } from '../_shared/types';
+import { throwProviderError } from '../_shared/errors';
 
 function getRequest(link: string): { imdbId: string; type: string } {
   const imdbId = link.match(/tt\d+/)?.[0] || '';

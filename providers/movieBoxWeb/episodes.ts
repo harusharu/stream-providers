@@ -1,6 +1,6 @@
-import { EpisodeLink, ProviderContext } from '../types';
+import { EpisodeLink, ProviderContext } from '../_shared/types';
 import { decodeLink, encodeLink } from './utils';
-import { throwProviderError } from '../providerErrors';
+import { throwProviderError } from '../_shared/errors';
 
 export const getEpisodes = async function ({
   url,

@@ -1,4 +1,4 @@
-import { throwProviderError } from '../providerErrors';
+import { throwProviderError } from '../_shared/errors';
 
 const hubcloudDecode = function (value: string) {
   if (value === undefined) {

@@ -1,5 +1,5 @@
 import { hubcloudExtractor } from '../extractors/hubcloud';
-import { ProviderContext, Stream } from '../types';
+import { ProviderContext, Stream } from '../_shared/types';
 
 type DownloadPage = {
   data: string;

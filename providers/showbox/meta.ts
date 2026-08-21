@@ -1,6 +1,6 @@
-import { Info, Link, ProviderContext } from '../types';
-import { getBaseUrl } from '../getBaseUrl';
-import { throwProviderError } from '../providerErrors';
+import { Info, Link, ProviderContext } from '../_shared/types';
+import { getBaseUrl } from '../_shared/sites';
+import { throwProviderError } from '../_shared/errors';
 
 export const getMeta = async function ({
   link,
@@ -11,7 +11,7 @@ export const getMeta = async function ({
 }): Promise<Info> {
   try {
     const { axios, cheerio } = providerContext;
-    const baseUrlShowbox = await getBaseUrl('showbox');
+    const baseUrlShowbox = getBaseUrl('showbox');
     const url = new URL(link, `${baseUrlShowbox}/`).href;
     const res = await axios.get(url);
     const data = res.data;

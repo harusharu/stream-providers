@@ -1,4 +1,4 @@
-import { throwProviderError } from '../providerErrors';
+import { throwProviderError } from '../_shared/errors';
 
 const GOFILE_API = 'https://api.gofile.io';
 const GOFILE_LANGUAGE = 'en-US';

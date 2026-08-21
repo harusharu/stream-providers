@@ -1,6 +1,6 @@
-import { ProviderContext } from '../types';
+import { ProviderContext } from '../_shared/types';
 import { hubcloudExtractor } from '../extractors/hubcloud';
-import { throwProviderError } from '../providerErrors';
+import { throwProviderError } from '../_shared/errors';
 
 export async function getStream({
   link,

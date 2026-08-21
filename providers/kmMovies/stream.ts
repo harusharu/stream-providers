@@ -1,7 +1,7 @@
-import { ProviderContext, Stream } from '../types';
+import { ProviderContext, Stream } from '../_shared/types';
 import { gofileExtractor } from '../extractors/gofile';
 import { hubcloudExtractor } from '../extractors/hubcloud';
-import { throwProviderError } from '../providerErrors';
+import { throwProviderError } from '../_shared/errors';
 
 const headers = {
   'User-Agent':

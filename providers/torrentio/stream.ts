@@ -1,5 +1,5 @@
-import { Stream, ProviderContext } from '../types';
-import { throwProviderError } from '../providerErrors';
+import { Stream, ProviderContext } from '../_shared/types';
+import { throwProviderError } from '../_shared/errors';
 
 const languageCodes = [
   ['MULTI', 'MULTI'],

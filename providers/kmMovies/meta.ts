@@ -1,12 +1,12 @@
-import { Info, Link, ProviderContext } from '../types';
-import { getBaseUrl } from '../getBaseUrl';
-import { throwProviderError } from '../providerErrors';
+import { Info, Link, ProviderContext } from '../_shared/types';
+import { getBaseUrl } from '../_shared/sites';
+import { throwProviderError } from '../_shared/errors';
 import {
   addCinemetaContext,
   applyCinemetaMeta,
   getCinemetaMeta,
   getCinemetaSeason,
-} from '../getCinemetaMeta';
+} from '../_shared/cinemeta';
 
 const kmmHeaders = {
   'User-Agent':
@@ -157,7 +157,7 @@ export const getMeta = async function ({
 }): Promise<Info> {
   try {
     const { axios, cheerio, openWebView } = providerContext;
-    const baseUrl = await getBaseUrl('kmmovies');
+    const baseUrl = getBaseUrl('kmMovies');
     const pageUrl = resolvePostUrl(link, baseUrl);
     const res = await getWithWAF(pageUrl, axios, openWebView, kmmHeaders);
     const html = String(res.data || '');

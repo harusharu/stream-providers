@@ -1,5 +1,5 @@
-import { Post, ProviderContext } from '../types';
-import { getBaseUrl } from '../getBaseUrl';
+import { Post, ProviderContext } from '../_shared/types';
+import { getBaseUrl } from '../_shared/sites';
 
 export const getPosts = async function ({
   filter,
@@ -15,7 +15,7 @@ export const getPosts = async function ({
   providerContext: ProviderContext;
 }): Promise<Post[]> {
   const { axios, cheerio } = providerContext;
-  const baseUrl = await getBaseUrl('showbox');
+  const baseUrl = getBaseUrl('showbox');
   const url = `${baseUrl + filter}?page=${page}/`;
   return posts({ url, signal, baseUrl, axios, cheerio });
 };
@@ -34,7 +34,7 @@ export const getSearchPosts = async function ({
   providerContext: ProviderContext;
 }): Promise<Post[]> {
   const { axios, cheerio, commonHeaders } = providerContext;
-  const baseUrl = await getBaseUrl('showbox');
+  const baseUrl = getBaseUrl('showbox');
   const url = `${baseUrl}/search?keyword=${searchQuery}&page=${page}`;
   return posts({
     url,

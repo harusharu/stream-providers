@@ -1,6 +1,6 @@
-import { EpisodeLink, ProviderContext } from '../types';
-import { throwProviderError } from '../providerErrors';
-import { enrichCinemetaEpisodes, getCinemetaMeta, readCinemetaContext } from '../getCinemetaMeta';
+import { EpisodeLink, ProviderContext } from '../_shared/types';
+import { throwProviderError } from '../_shared/errors';
+import { enrichCinemetaEpisodes, getCinemetaMeta, readCinemetaContext } from '../_shared/cinemeta';
 
 const headers = {
   'User-Agent':

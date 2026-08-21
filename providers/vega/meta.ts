@@ -1,7 +1,11 @@
-import { Info, Link, ProviderContext } from '../types';
-import { getBaseUrl } from '../getBaseUrl';
-import { CinemetaMeta, getCinemetaMeta } from '../getCinemetaMeta';
-import { addEpisodeContext, getSeasonNumber } from './cinemeta';
+import { Info, Link, ProviderContext } from '../_shared/types';
+import { getBaseUrl } from '../_shared/sites';
+import {
+  addCinemetaContext as addEpisodeContext,
+  CinemetaMeta,
+  getCinemetaMeta,
+  getCinemetaSeason as getSeasonNumber,
+} from '../_shared/cinemeta';
 
 const headers = {
   Accept:
@@ -56,7 +60,7 @@ export const getMeta = async ({
 }): Promise<Info> => {
   try {
     const { axios, cheerio } = providerContext;
-    const currentBaseUrl = await getBaseUrl('Vega');
+    const currentBaseUrl = getBaseUrl('vega');
     const url = new URL(link, `${currentBaseUrl}/`).href;
     console.log('url', url);
     const baseUrl = url.split('/').slice(0, 3).join('/');

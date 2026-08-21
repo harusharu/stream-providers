@@ -1,5 +1,5 @@
-import { getBaseUrl } from '../getBaseUrl';
-import { Info, Link, ProviderContext } from '../types';
+import { getBaseUrl } from '../_shared/sites';
+import { Info, Link, ProviderContext } from '../_shared/types';
 
 const providerValue = 'eonMovies';
 
@@ -52,7 +52,7 @@ export async function getMeta({
   link: string;
   providerContext: ProviderContext;
 }): Promise<Info> {
-  const baseUrl = await getBaseUrl(providerValue);
+  const baseUrl = getBaseUrl(providerValue);
   const url = new URL(link, `${baseUrl}/`).href;
   const response = await providerContext.axios.get(url);
   const $ = providerContext.cheerio.load(response.data || '');

@@ -1,6 +1,6 @@
-import { ProviderContext, Stream } from '../types';
+import { ProviderContext, Stream } from '../_shared/types';
 import { hubcloudExtractor } from '../extractors/hubcloud';
-import { throwProviderError } from '../providerErrors';
+import { throwProviderError } from '../_shared/errors';
 
 const headers = {
   Accept:
@@ -44,7 +44,7 @@ export async function getStream({
           },
         });
       } catch (error: any) {
-        if (error.response?.status === 403) {
+        if (error.response?.status === 403 && typeof openWebView === 'function') {
           console.log('Solving WAF for Movies4U...');
           const wafResult = await openWebView(link, {
             title: 'Solve the captcha below and click done',

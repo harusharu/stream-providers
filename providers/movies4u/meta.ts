@@ -1,12 +1,12 @@
-import { Info, Link, ProviderContext } from '../types';
-import { getBaseUrl } from '../getBaseUrl';
-import { throwProviderError } from '../providerErrors';
+import { Info, Link, ProviderContext } from '../_shared/types';
+import { getBaseUrl } from '../_shared/sites';
+import { throwProviderError } from '../_shared/errors';
 import {
   addCinemetaContext,
   applyCinemetaMeta,
   getCinemetaMeta,
   getCinemetaSeason,
-} from '../getCinemetaMeta';
+} from '../_shared/cinemeta';
 
 // Headers
 const headers = {
@@ -37,7 +37,7 @@ export const getMeta = async function ({
   providerContext: ProviderContext;
 }): Promise<Info> {
   const { axios, cheerio } = providerContext;
-  const baseUrl = await getBaseUrl('movies4u');
+  const baseUrl = getBaseUrl('movies4u');
   const url = new URL(link, `${baseUrl}/`).href;
 
   try {

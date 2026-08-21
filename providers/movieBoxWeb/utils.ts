@@ -1,4 +1,4 @@
-import { ProviderContext } from '../types';
+import { ProviderContext } from '../_shared/types';
 
 export const providerValue = 'movieBoxWeb';
 

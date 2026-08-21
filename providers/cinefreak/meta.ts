@@ -1,10 +1,9 @@
-import { getBaseUrl } from '../getBaseUrl';
-import { applyCinemetaMeta, enrichCinemetaEpisodes, getCinemetaMeta } from '../getCinemetaMeta';
-import { Info, Link, ProviderContext } from '../types';
-import { throwProviderError } from '../providerErrors';
+import { getBaseUrl } from '../_shared/sites';
+import { applyCinemetaMeta, enrichCinemetaEpisodes, getCinemetaMeta } from '../_shared/cinemeta';
+import { Info, Link, ProviderContext } from '../_shared/types';
+import { throwProviderError } from '../_shared/errors';
 
 const providerValue = 'cinefreak';
-const defaultBaseUrl = 'https://cinefreak.net';
 
 function cleanQuality(text: string): string {
   const match = text.match(/\b(480p|720p|1080p|2160p|4k)\b/i);
@@ -48,7 +47,7 @@ export const getMeta = async function ({
 }): Promise<Info> {
   const { axios, cheerio, commonHeaders } = providerContext;
   try {
-    const baseUrl = (await getBaseUrl(providerValue)) || defaultBaseUrl;
+    const baseUrl = getBaseUrl(providerValue);
     const url = new URL(link, baseUrl).href;
 
     const response = await axios.get(url, {
