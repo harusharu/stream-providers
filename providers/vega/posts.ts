@@ -1,6 +1,6 @@
-import { Post, ProviderContext } from '../types';
-import { getBaseUrl } from '../getBaseUrl';
-import { throwProviderError } from '../providerErrors';
+import { Post, ProviderContext } from '../_shared/types';
+import { getBaseUrl } from '../_shared/sites';
+import { throwProviderError } from '../_shared/errors';
 
 const headers = {
   Accept:
@@ -36,7 +36,7 @@ export const getPosts = async ({
   providerContext: ProviderContext;
 }): Promise<Post[]> => {
   const { axios, cheerio } = providerContext;
-  const baseUrl = await getBaseUrl('Vega');
+  const baseUrl = getBaseUrl('vega');
 
   console.log('vegaGetPosts baseUrl:', providerValue, baseUrl);
   const url = filter ? `${baseUrl}/${filter}/page/${page}/` : `${baseUrl}/page/${page}/`;
@@ -58,7 +58,7 @@ export const getSearchPosts = async ({
   providerContext: ProviderContext;
 }): Promise<Post[]> => {
   const { axios, cheerio } = providerContext;
-  const baseUrl = await getBaseUrl('Vega');
+  const baseUrl = getBaseUrl('vega');
 
   console.log('vegaGetPosts baseUrl:', providerValue, baseUrl);
   const url = `${baseUrl}/search.php?q=${searchQuery}&page=${page}`;

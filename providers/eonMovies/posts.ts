@@ -1,5 +1,5 @@
-import { getBaseUrl } from '../getBaseUrl';
-import { Post, ProviderContext } from '../types';
+import { getBaseUrl } from '../_shared/sites';
+import { Post, ProviderContext } from '../_shared/types';
 
 const providerValue = 'eonMovies';
 
@@ -48,7 +48,7 @@ export async function getPosts({
   signal: AbortSignal;
   providerContext: ProviderContext;
 }): Promise<Post[]> {
-  const baseUrl = await getBaseUrl(providerValue);
+  const baseUrl = getBaseUrl(providerValue);
   const url = new URL('/', `${baseUrl}/`);
   url.search = new URLSearchParams({
     action: '',
@@ -71,7 +71,7 @@ export async function getSearchPosts({
   signal: AbortSignal;
   providerContext: ProviderContext;
 }): Promise<Post[]> {
-  const baseUrl = await getBaseUrl(providerValue);
+  const baseUrl = getBaseUrl(providerValue);
   const url = new URL('/', `${baseUrl}/`);
   url.search = new URLSearchParams({
     action: 'search',

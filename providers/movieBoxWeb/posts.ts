@@ -1,5 +1,5 @@
-import { getBaseUrl } from '../getBaseUrl';
-import { Post, ProviderContext } from '../types';
+import { getBaseUrl } from '../_shared/sites';
+import { Post, ProviderContext } from '../_shared/types';
 import { absoluteUrl, parseNuxtData, providerValue } from './utils';
 
 type SubjectPreview = {
@@ -63,7 +63,7 @@ async function fetchPosts(
   signal: AbortSignal,
   providerContext: ProviderContext,
 ): Promise<Post[]> {
-  const baseUrl = await getBaseUrl(providerValue);
+  const baseUrl = getBaseUrl(providerValue);
   const response = await fetch(absoluteUrl(baseUrl, path), { signal });
   if (!response.ok) throw new Error(`MovieBox Web returned ${response.status}`);
 
@@ -121,7 +121,7 @@ async function fetchCatalogPage(
   page: number,
   signal: AbortSignal,
 ): Promise<Post[]> {
-  const baseUrl = await getBaseUrl(providerValue);
+  const baseUrl = getBaseUrl(providerValue);
   const params = new URLSearchParams({
     page: String(Math.max(1, page)),
     perPage: String(pageSize),

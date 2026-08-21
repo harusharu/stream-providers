@@ -1,6 +1,6 @@
-import { getBaseUrl } from '../getBaseUrl';
-import { Info, Link, ProviderContext } from '../types';
-import { throwProviderError } from '../providerErrors';
+import { getBaseUrl } from '../_shared/sites';
+import { Info, Link, ProviderContext } from '../_shared/types';
+import { throwProviderError } from '../_shared/errors';
 import {
   absoluteUrl,
   detailPath,
@@ -40,7 +40,7 @@ export const getMeta = async function ({
   providerContext: ProviderContext;
 }): Promise<Info> {
   try {
-    const baseUrl = await getBaseUrl(providerValue);
+    const baseUrl = getBaseUrl(providerValue);
     const pageUrl = absoluteUrl(baseUrl, `/moviesDetail/${detailPath(link)}`);
     const response = await fetch(pageUrl);
     if (!response.ok) {

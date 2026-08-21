@@ -1,7 +1,10 @@
-import { getCinemetaMeta } from '../getCinemetaMeta';
-import { throwProviderError } from '../providerErrors';
-import { EpisodeLink, ProviderContext } from '../types';
-import { enrichEpisodes, readEpisodeContext } from './cinemeta';
+import {
+  enrichCinemetaEpisodes as enrichEpisodes,
+  getCinemetaMeta,
+  readCinemetaContext as readEpisodeContext,
+} from '../_shared/cinemeta';
+import { throwProviderError } from '../_shared/errors';
+import { EpisodeLink, ProviderContext } from '../_shared/types';
 
 export const getEpisodes = async function ({
   url,

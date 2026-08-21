@@ -1,4 +1,7 @@
-import { Post, ProviderContext } from '../types';
+import { getBaseUrl } from '../_shared/sites';
+import { Post, ProviderContext } from '../_shared/types';
+
+const CINEMETA_META = 'https://v3-cinemeta.strem.io';
 
 export const getPosts = async function ({
   filter,
@@ -13,7 +16,7 @@ export const getPosts = async function ({
 }): Promise<Post[]> {
   try {
     const catalog: Post[] = [];
-    const url = 'https://cinemeta-catalogs.strem.io' + filter;
+    const url = getBaseUrl('autoEmbed') + filter;
     console.log('allGetPostUrl', url);
     const res = await providerContext.axios.get(url, {
       headers: providerContext.commonHeaders,
@@ -28,7 +31,7 @@ export const getPosts = async function ({
       if (id) {
         catalog.push({
           title: title,
-          link: `https://v3-cinemeta.strem.io/meta/${type}/${id}.json`,
+          link: `${CINEMETA_META}/meta/${type}/${id}.json`,
           image: image,
         });
       }
@@ -59,12 +62,8 @@ export const getSearchPosts = async function ({
       return [];
     }
     const catalog: Post[] = [];
-    const url1 = `https://v3-cinemeta.strem.io/catalog/series/top/search=${encodeURI(
-      searchQuery,
-    )}.json`;
-    const url2 = `https://v3-cinemeta.strem.io/catalog/movie/top/search=${encodeURI(
-      searchQuery,
-    )}.json`;
+    const url1 = `${CINEMETA_META}/catalog/series/top/search=${encodeURI(searchQuery)}.json`;
+    const url2 = `${CINEMETA_META}/catalog/movie/top/search=${encodeURI(searchQuery)}.json`;
     const res = await providerContext.axios.get(url1, {
       headers: providerContext.commonHeaders,
       signal,
@@ -78,7 +77,7 @@ export const getSearchPosts = async function ({
       if (id) {
         catalog.push({
           title: title,
-          link: `https://v3-cinemeta.strem.io/meta/${type}/${id}.json`,
+          link: `${CINEMETA_META}/meta/${type}/${id}.json`,
           image: image,
         });
       }
@@ -96,7 +95,7 @@ export const getSearchPosts = async function ({
       if (id) {
         catalog.push({
           title: title,
-          link: `https://v3-cinemeta.strem.io/meta/${type}/${id}.json`,
+          link: `${CINEMETA_META}/meta/${type}/${id}.json`,
           image: image,
         });
       }

@@ -1,6 +1,6 @@
-import { Post, ProviderContext } from '../types';
-import { getBaseUrl } from '../getBaseUrl';
-import { throwProviderError } from '../providerErrors';
+import { Post, ProviderContext } from '../_shared/types';
+import { getBaseUrl } from '../_shared/sites';
+import { throwProviderError } from '../_shared/errors';
 
 const defaultHeaders = {
   accept:
@@ -72,7 +72,7 @@ async function fetchPosts({
   providerContext: ProviderContext;
 }): Promise<Post[]> {
   try {
-    const baseUrl = await getBaseUrl('movies4u');
+    const baseUrl = getBaseUrl('movies4u');
     let url: string;
 
     // --- Build URL for category filter or search query

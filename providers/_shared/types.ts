@@ -1,12 +1,6 @@
 import { AxiosStatic } from 'axios';
 import * as cheerio from 'cheerio';
 
-// Content type for providers (replaces zustand import)
-export interface Content {
-  provider: string;
-  [key: string]: any;
-}
-
 // getPosts
 export interface Post {
   title: string;
@@ -75,69 +69,6 @@ export interface Catalog {
   filter: string;
 }
 
-export interface ProviderType {
-  searchFilter?: string;
-  catalog: Catalog[];
-  genres: Catalog[];
-  blurImage?: boolean;
-  nonStreamableServer?: string[];
-  nonDownloadableServer?: string[];
-  GetStream: ({
-    link,
-    type,
-    signal,
-    providerContext,
-  }: {
-    link: string;
-    type: string;
-    signal: AbortSignal;
-    providerContext: ProviderContext;
-  }) => Promise<Stream[]>;
-  GetHomePosts: ({
-    filter,
-    page,
-    providerValue,
-    signal,
-    providerContext,
-  }: {
-    filter: string;
-    page: number;
-    providerValue: string;
-    signal: AbortSignal;
-    providerContext: ProviderContext;
-  }) => Promise<Post[]>;
-  GetEpisodeLinks?: ({
-    url,
-    providerContext,
-  }: {
-    url: string;
-    providerContext: ProviderContext;
-  }) => Promise<EpisodeLink[]>;
-  GetMetaData: ({
-    link,
-    provider,
-    providerContext,
-  }: {
-    link: string;
-    provider: Content['provider'];
-    providerContext: ProviderContext;
-  }) => Promise<Info>;
-  GetSearchPosts: ({
-    searchQuery,
-    page,
-    providerValue,
-    signal,
-    providerContext,
-  }: {
-    searchQuery: string;
-    page: number;
-    providerValue: string;
-    signal: AbortSignal;
-    providerContext: ProviderContext;
-  }) => Promise<Post[]>;
-}
-
-// Options to customize the WAF-solving WebView dialog.
 // Options to customize the WAF-solving WebView dialog.
 export interface OpenWebViewOptions {
   // Title shown in the dialog header.
@@ -174,5 +105,5 @@ export type ProviderContext = {
   Aes: any; // AES encryption utility, if used
   commonHeaders: Record<string, string>;
   cheerio: typeof cheerio;
-  openWebView: (url: string, options?: OpenWebViewOptions) => Promise<OpenWebViewResult>;
+  openWebView?: (url: string, options?: OpenWebViewOptions) => Promise<OpenWebViewResult>;
 };

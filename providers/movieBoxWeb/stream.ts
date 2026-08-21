@@ -1,6 +1,6 @@
-import { getBaseUrl } from '../getBaseUrl';
-import { ProviderContext, Stream, TextTracks } from '../types';
-import { throwProviderError } from '../providerErrors';
+import { getBaseUrl } from '../_shared/sites';
+import { ProviderContext, Stream, TextTracks } from '../_shared/types';
+import { throwProviderError } from '../_shared/errors';
 import { absoluteUrl, decodeLink, providerValue } from './utils';
 
 type PlayStream = {
@@ -86,7 +86,7 @@ export const getStream = async function ({
 }): Promise<Stream[]> {
   try {
     const playback = decodeLink(link);
-    const baseUrl = await getBaseUrl(providerValue);
+    const baseUrl = getBaseUrl(providerValue);
     const watchParams = new URLSearchParams({
       id: playback.subjectId,
       type: '/movie/detail',

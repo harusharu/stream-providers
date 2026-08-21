@@ -1,6 +1,6 @@
-import { EpisodeLink, ProviderContext } from '../types';
-import { throwProviderError } from '../providerErrors';
-import { enrichCinemetaEpisodes, getCinemetaMeta, readCinemetaContext } from '../getCinemetaMeta';
+import { EpisodeLink, ProviderContext } from '../_shared/types';
+import { throwProviderError } from '../_shared/errors';
+import { enrichCinemetaEpisodes, getCinemetaMeta, readCinemetaContext } from '../_shared/cinemeta';
 
 // यहाँ `getEpisodes` फ़ंक्शन मान रहा है कि यह उस पेज को स्क्रैप कर रहा है
 // जो 'Download Links' बटन से प्राप्त हुआ है (जैसे m4ulinks.com/number/42882)

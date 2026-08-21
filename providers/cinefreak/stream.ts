@@ -1,7 +1,7 @@
-import { ProviderContext, Stream } from '../types';
+import { ProviderContext, Stream } from '../_shared/types';
 import { hubcloudExtractor } from '../extractors/hubcloud';
 import { zcloudExtractor } from '../extractors/zcloud';
-import { throwProviderError } from '../providerErrors';
+import { throwProviderError } from '../_shared/errors';
 
 function decodeBase64Safe(str: string): string {
   try {

@@ -1,9 +1,8 @@
-import { getBaseUrl } from '../getBaseUrl';
-import { Post, ProviderContext } from '../types';
-import { throwProviderError } from '../providerErrors';
+import { getBaseUrl } from '../_shared/sites';
+import { Post, ProviderContext } from '../_shared/types';
+import { throwProviderError } from '../_shared/errors';
 
 const providerValue = 'cinefreak';
-const defaultBaseUrl = 'https://cinefreak.net';
 
 function toPath(link: string, baseUrl: string): string {
   try {
@@ -74,7 +73,7 @@ export async function getPosts({
   signal: AbortSignal;
   providerContext: ProviderContext;
 }): Promise<Post[]> {
-  const baseUrl = (await getBaseUrl(providerValue)) || defaultBaseUrl;
+  const baseUrl = getBaseUrl(providerValue);
   const cleanFilter = filter ? filter.replace(/\/+$/, '') : '';
   const pageUrl =
     page <= 1 ? `${baseUrl}${cleanFilter}/` : `${baseUrl}${cleanFilter}/page/${page}/`;
@@ -94,7 +93,7 @@ export async function getSearchPosts({
   signal: AbortSignal;
   providerContext: ProviderContext;
 }): Promise<Post[]> {
-  const baseUrl = (await getBaseUrl(providerValue)) || defaultBaseUrl;
+  const baseUrl = getBaseUrl(providerValue);
   const encodedQuery = encodeURIComponent(searchQuery.trim());
   const searchUrl =
     page <= 1 ? `${baseUrl}/?s=${encodedQuery}` : `${baseUrl}/page/${page}/?s=${encodedQuery}`;

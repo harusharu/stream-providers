@@ -1,6 +1,6 @@
-import { Post, ProviderContext } from '../types';
-import { getBaseUrl } from '../getBaseUrl';
-import { throwProviderError } from '../providerErrors';
+import { Post, ProviderContext } from '../_shared/types';
+import { getBaseUrl } from '../_shared/sites';
+import { throwProviderError } from '../_shared/errors';
 
 export const getPosts = async function ({
   filter,
@@ -15,7 +15,7 @@ export const getPosts = async function ({
   providerContext: ProviderContext;
 }): Promise<Post[]> {
   const { cheerio } = providerContext;
-  const baseUrl = await getBaseUrl('4khdhub');
+  const baseUrl = getBaseUrl('4khdhub');
   const url = `${baseUrl + filter}/page/${page}`;
   console.log('4khdhubGetPosts url', url);
   return posts({ baseUrl, url, signal, cheerio, operation: 'posts' });
@@ -34,7 +34,7 @@ export const getSearchPosts = async function ({
   providerContext: ProviderContext;
 }): Promise<Post[]> {
   const { cheerio } = providerContext;
-  const baseUrl = await getBaseUrl('4khdhub');
+  const baseUrl = getBaseUrl('4khdhub');
   const url =
     page == 1 ? `${baseUrl}/?s=${searchQuery}` : `${baseUrl}/page/${page}?s=${searchQuery}`;
   console.log('4khdhubGetSearchPosts url', url);
