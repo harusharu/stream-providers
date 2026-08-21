@@ -29,7 +29,7 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          node .github/scripts/url-checker.js 2>&1 | tee checker_output.log
+          node scripts/check-urls.ts 2>&1 | tee checker_output.log
 
           if grep -q "### UPDATED_PROVIDERS_START ###" checker_output.log; then
             sed -n '/### UPDATED_PROVIDERS_START ###/,/### UPDATED_PROVIDERS_END ###/p' checker_output.log \
@@ -40,7 +40,7 @@ jobs:
         id: commit
         shell: bash
         run: |
-          if [[ -z "$(git status --porcelain urls.json)" ]]; then
+          if [[ -z "$(git status --porcelain providers/_shared/sites.ts)" ]]; then
             echo "No URL changes detected"
             echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
@@ -48,7 +48,7 @@ jobs:
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add urls.json
+          git add providers/_shared/sites.ts
           git commit -m "Update provider URLs [skip ci]"
           git push
           echo "changed=true" >> "$GITHUB_OUTPUT"
