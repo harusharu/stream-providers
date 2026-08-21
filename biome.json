@@ -24,16 +24,6 @@
     }
   },
   "files": {
-    "includes": [
-      "providers/**",
-      "rust-api/worker/**",
-      "hono-api/api.ts",
-      "hono-api/lib/**",
-      "hono-api/scripts/**",
-      "build-bundled.js",
-      "scripts/**",
-      "static/**",
-      ".github/**"
-    ]
+    "includes": ["providers/**", "gateway/**", "build-bundled.cjs", "scripts/**", ".github/**"]
   }
 }

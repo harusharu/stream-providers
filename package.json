@@ -1,32 +1,35 @@
 {
   "name": "stream-providers",
   "version": "1.0.0",
-  "description": "Self-hosted stream provider source bundles for the Rust/Actix and Hono APIs.",
+  "description": "Self-hosted stream provider source bundles with a Hono API gateway.",
   "private": true,
-  "type": "commonjs",
+  "type": "module",
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22.18.0"
   },
   "scripts": {
-    "build": "node build-bundled.js",
-    "build:dev": "cross-env SKIP_MINIFY=true node build-bundled.js",
+    "build": "node build-bundled.cjs",
+    "build:dev": "node build-bundled.cjs --dev",
+    "start": "node gateway/server.ts",
+    "dev": "node gateway/server.ts",
     "typecheck": "tsc --noEmit",
     "format": "biome format --write .",
-    "format:check": "biome format ."
-  },
-  "devDependencies": {
-    "@biomejs/biome": "^2.5.8",
-    "@types/cheerio": "0.22.35",
-    "@types/node": "24.13.3",
-    "cross-env": "7.0.3",
-    "esbuild": "0.28.2",
-    "terser": "5.50.0",
-    "typescript": "5.9.3"
+    "format:check": "biome format .",
+    "test:api": "node scripts/api-suite.js",
+    "check:urls": "node scripts/check-urls.ts"
   },
   "dependencies": {
     "axios": "1.19.0",
     "cheerio": "1.2.0",
-    "curl-cffi-node": "0.1.8"
+    "curl-cffi-node": "0.1.8",
+    "hono": "^4.6.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.8",
+    "@types/node": "^24.0.0",
+    "esbuild": "0.28.2",
+    "terser": "5.50.0",
+    "typescript": "^5.9.0"
   },
   "overrides": {
     "curl-cffi-node-darwin-arm64": "npm:@curl-cffi-node/darwin-arm64@0.1.8",

@@ -1,14 +1,5 @@
 node_modules/
-build/
+dist/
 *.log
-*.env
-*.env.local
-*.env.prod
-!dist
-target/
-doc/book/
-doc/.mdbook
-.agents/
-.claude/
-skills-lock.json
-.vercel
+.env
+.DS_Store

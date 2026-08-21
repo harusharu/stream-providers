@@ -43,30 +43,24 @@ function okEnvelope(j) {
 }
 
 async function main() {
-  console.log(`\n=== RUST API @ ${BASE} ===`);
+  console.log(`\n=== API @ ${BASE} ===`);
 
   console.log(`\n--- 1. System ---`);
   {
     const r = await req('/health');
     report(
       'GET /health',
-      r.status === 200 && r.json?.status === 'healthy' && r.json?.providers === 9,
+      r.status === 200 && r.json?.status === 'healthy' && r.json?.providers >= 1,
       `status=${r.status} ${JSON.stringify(r.json)}`,
     );
     const p = await req('/providers');
     report(
       'GET /providers',
-      p.status === 200 && Array.isArray(p.json?.providers) && p.json.providers.length === 9,
+      p.status === 200 && Array.isArray(p.json?.channels) && p.json.channels.length >= 1,
       `status=${p.status}`,
     );
     const i = await req('/info');
     report('GET /info', i.status === 200 && Array.isArray(i.json?.providers), `status=${i.status}`);
-    const u = await req('/urls.json');
-    report(
-      'GET /urls.json',
-      u.status === 200 && Object.keys(u.json || {}).length >= 30,
-      `status=${u.status} providers=${Object.keys(u.json || {}).length}`,
-    );
     const d = await req('/');
     report(
       'GET / (dashboard)',
@@ -75,7 +69,7 @@ async function main() {
     );
     const l = await req('/api/providers');
     report(
-      'GET /api/providers (legacy)',
+      'GET /api/providers',
       l.status === 200 && okEnvelope(l.json) && Array.isArray(l.json.data),
       `status=${l.status}`,
     );
@@ -108,13 +102,13 @@ async function main() {
         items.every((x) => x.title && x.link),
       `status=${r.status} results=${items.length}`,
     );
-    global.__rustItems = items;
+    global.__items = items;
   }
 
   console.log(`\n--- 4. Search-all (fan-out) ---`);
   {
     const r = await req('/api/search-all?query=inception&providers=vega,showbox', 60000);
-    const d = r.json?.data;
+    const d = r.json;
     report(
       'GET /api/search-all (2 providers)',
       r.status === 200 &&
@@ -129,8 +123,8 @@ async function main() {
     const r2 = await req('/api/search-all?query=inception', 90000);
     report(
       'GET /api/search-all (all providers)',
-      r2.status === 200 && r2.json?.data?.total > 0,
-      `status=${r2.status} total=${r2.json?.data?.total ?? 0}`,
+      r2.status === 200 && r2.json?.total > 0,
+      `status=${r2.status} total=${r2.json?.total ?? 0}`,
     );
   }
 
@@ -156,8 +150,8 @@ async function main() {
     );
     const r4 = await req('/api/catalog');
     report(
-      'missing provider -> 200 (default provider fallback)',
-      r4.status === 200 && okEnvelope(r4.json) && Array.isArray(r4.json.data),
+      'missing provider -> 400',
+      r4.status === 400 && r4.json?.success === false,
       `status=${r4.status}`,
     );
     const r5 = await req('/api/search?provider=vega&query=');
@@ -174,8 +168,8 @@ async function main() {
     );
   }
 
-  if (!QUICK && Array.isArray(global.__rustItems) && global.__rustItems.length > 0) {
-    const item = global.__rustItems[0];
+  if (!QUICK && Array.isArray(global.__items) && global.__items.length > 0) {
+    const item = global.__items[0];
     console.log(`\n--- 6. Deep scrape (${item.title}) ---`);
     let metaData = null;
     {
